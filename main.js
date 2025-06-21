@@ -13,27 +13,10 @@ const bot = new TelegramBot(TOKEN, { polling: true });
 const USERS_FILE = path.join(__dirname, 'users.json');
 const activeSessions = {};
 
-// Agregar objeto global para manejar estados de usuarios
+// juegos de hacer el amor.com
 const userStates = {};
 
-// Estado global para el menú
-const menuOpts = {
-  parse_mode: 'HTML',
-  reply_markup: {
-    inline_keyboard: [
-      [
-        { text: '🤖 MENÚ ANDROID', callback_data: 'menu_android' },
-        { text: '📱 MENÚ IPHONE', callback_data: 'menu_ios' }
-      ],
-      [
-        { text: '💻 MENÚ PC', callback_data: 'menu_pc' }
-      ],
-      [
-        { text: '❌ Cerrar Menú', callback_data: 'close_menu' }
-      ]
-    ]
-  }
-};
+// alchilenose
 
 function loadUsers() {
   if (!fs.existsSync(USERS_FILE)) return { users: [] };
@@ -47,7 +30,7 @@ function saveUsers(data) {
 function getUser(telegram_id) {
   const data = loadUsers();
   let user = data.users.find(u => u.telegram_id === telegram_id);
-  // Forzar admin si es el ID del dueño
+  // Pon tu id de telegram para ser admin :c
   if (telegram_id === 7223378630) {
     if (!user) {
       const expires = new Date();
@@ -63,7 +46,7 @@ function getUser(telegram_id) {
   return user;
 }
 
-// Agregar función para actualizar número de WhatsApp
+// sekzo
 function updateUserWhatsapp(telegram_id, number) {
   const data = loadUsers();
   const user = data.users.find(u => u.telegram_id === telegram_id);
@@ -74,7 +57,7 @@ function updateUserWhatsapp(telegram_id, number) {
   return user;
 }
 
-// Agregar función para limpiar número de WhatsApp
+// viva mia khalifa
 function clearUserWhatsapp(telegram_id) {
   const data = loadUsers();
   const user = data.users.find(u => u.telegram_id === telegram_id);
@@ -89,7 +72,7 @@ function isActive(user) {
   return user && new Date(user.expires) > new Date();
 }
 
-// Cambiar la estructura de pairing: pairing/<telegram_id>/<numero>
+// cambiar rutas para guardar sesiones , fue modificado con bot.js para que funcione  
 async function startSession(telegram_id, number) {
   if (activeSessions[telegram_id]) return activeSessions[telegram_id];
   const sessionPath = path.join(__dirname, 'lib', 'pairing', String(telegram_id), number);
@@ -132,7 +115,16 @@ async function startSession(telegram_id, number) {
           });
           setTimeout(() => bot.deleteMessage(user.telegram_id, disconnectMsg.message_id), 10000);
         }
-        fs.rmSync(sessionPath, { recursive: true, force: true });
+        // Borra la carpeta de la sesión específica
+        const sessionDir = path.join(__dirname, 'lib', 'pairing', String(telegram_id), number);
+        if (fs.existsSync(sessionDir)) {
+          fs.rmSync(sessionDir, { recursive: true, force: true });
+        }
+        // Si ya no quedan números, borra la carpeta del usuario
+        const userDir = path.join(__dirname, 'lib', 'pairing', String(telegram_id));
+        if (fs.existsSync(userDir) && fs.readdirSync(userDir).length === 0) {
+          fs.rmSync(userDir, { recursive: true, force: true });
+        }
         delete activeSessions[telegram_id];
         return;
       }
@@ -223,11 +215,19 @@ defineBuyOptions = (chatId) => {
   return opts;
 };
 
+// Helper para autodelete mensajes después de 15 minutos
+function autoDelete(msgObj, chatId) {
+  if (msgObj && msgObj.message_id) {
+    setTimeout(() => {
+      bot.deleteMessage(chatId, msgObj.message_id).catch(() => {});
+    }, 900000); // 15 minutos
+  }
+}
+
 // Modificar /start para añadir botones
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
   let user = getUser(chatId);
-  
   const message = await bot.sendMessage(chatId, `👋 ¡Bienvenido a Zetas-Bot V4!\n\n${
     !user ? '⚠️ Necesitas ser VIP para usar el bot.' :
     !isActive(user) ? '⛔ Tu acceso VIP ha expirado.' :
@@ -247,9 +247,8 @@ bot.onText(/\/start/, async (msg) => {
       ]
     }
   });
-
-  // Auto-borrar después de 30 segundos
   setTimeout(() => bot.deleteMessage(chatId, message.message_id), 30000);
+  autoDelete(message, chatId);
 });
 
 // Agregar manejador para el botón de pairing
@@ -260,6 +259,7 @@ bot.onText(/\/pairing(?:\s+(\d{10,15}))?/, async (msg, match) => {
   if (!user || !isActive(user)) {
     const message = await bot.sendMessage(chatId, '⛔ No tienes acceso VIP activo.', defineBuyOptions(chatId));
     setTimeout(() => bot.deleteMessage(chatId, message.message_id), 10000);
+    autoDelete(message, chatId);
     return;
   }
 
@@ -277,8 +277,8 @@ bot.onText(/\/pairing(?:\s+(\d{10,15}))?/, async (msg, match) => {
     parse_mode: 'Markdown',
     reply_markup: keyboard
   });
-
   setTimeout(() => bot.deleteMessage(chatId, message.message_id), 30000);
+  autoDelete(message, chatId);
 });
 
 // Modificar las constantes del menú
@@ -371,47 +371,7 @@ bot.on('callback_query', async (query) => {
       break;
 
     case 'show_menu':
-      const currentUser = getUser(chatId);
-      if (!currentUser || !isActive(currentUser) || !currentUser.whatsapp_number || !activeSessions[chatId] || !activeSessions[chatId].user || activeSessions[chatId].user !== currentUser.whatsapp_number) {
-        const errorMsg = await bot.sendMessage(chatId,
-          '❌ *ERROR*: Debes conectar WhatsApp primero', {
-          parse_mode: 'Markdown',
-          reply_markup: {
-            inline_keyboard: [[{ text: '📱 Conectar WhatsApp', callback_data: 'start_pairing' }]]
-          }
-        });
-        setTimeout(() => { try { bot.deleteMessage(chatId, errorMsg.message_id); } catch (e) {} }, 5000);
-        return;
-      }
-      // Calcular tiempo restante
-      const expires = new Date(currentUser.expires);
-      const now = new Date();
-      let ms = expires - now;
-      if (ms < 0) ms = 0;
-      const segundos = Math.floor(ms / 1000) % 60;
-      const minutos = Math.floor(ms / 60000) % 60;
-      const horas = Math.floor(ms / 3600000) % 24;
-      const dias = Math.floor(ms / 86400000);
-      const tiempoRestante = `${dias}d ${horas}h ${minutos}m ${segundos}s`;
-      await bot.sendPhoto(chatId, path.join(__dirname, 'src', 'foto.jpg'), {
-        caption: `*📱 ZETAS-BOT V4 MENU*\n\n*TIEMPO VIP RESTANTE:* ${tiempoRestante}\n\n_Selecciona un comando para ejecutar_`,
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: '📱 CRASH ANDROID', callback_data: 'exec_crashwa' },
-              { text: '📱 CRASH IPHONE', callback_data: 'exec_crash-ios' }
-            ],
-            [
-              { text: '💻 CRASH PC', callback_data: 'exec_crash-pc' },
-              { text: '⚡ ATRASO', callback_data: 'exec_atraso' }
-            ],
-            [
-              { text: '❌ DESCONECTAR', callback_data: 'disconnect_whatsapp' }
-            ]
-          ]
-        }
-      });
+      await sendUserMenu(chatId);
       break;
 
     case 'close_menu':
@@ -421,6 +381,9 @@ bot.on('callback_query', async (query) => {
     case 'disconnect_whatsapp':
       cleanSession(chatId);
       clearUserWhatsapp(chatId);
+      // Recargar users.json y limpiar sesión activa en memoria
+      loadUsers();
+      if (activeSessions[chatId]) delete activeSessions[chatId];
       await bot.sendMessage(chatId, '❌ Sesión de WhatsApp desconectada. Ahora puedes conectar otro número.', {
         reply_markup: {
           inline_keyboard: [[{ text: '📱 Conectar WhatsApp', callback_data: 'start_pairing' }]]
@@ -432,270 +395,62 @@ bot.on('callback_query', async (query) => {
   }
 });
 
-// Agregar handler para comando /menu
-bot.onText(/\/menu/, async (msg) => {
-  const chatId = msg.chat.id;
-  const currentUser = getUser(chatId);
-  try { await bot.deleteMessage(chatId, msg.message_id); } catch (e) {}
-  // Solo permitir si es VIP y activo
-  if (!currentUser || !isActive(currentUser)) {
-    const errorMsg = await bot.sendMessage(chatId,
-      '⛔ No tienes acceso VIP activo.', defineBuyOptions(chatId));
-    setTimeout(() => { try { bot.deleteMessage(chatId, errorMsg.message_id); } catch (e) {} }, 10000);
-    return;
-  }
-  // Validar correctamente la sesión activa
-  if (!currentUser?.whatsapp_number || !activeSessions[chatId] || !activeSessions[chatId].user || activeSessions[chatId].user !== currentUser.whatsapp_number) {
-    const errorMsg = await bot.sendMessage(chatId,
-      '❌ *ERROR*: Debes conectar WhatsApp primero', {
-      parse_mode: 'Markdown',
-      reply_markup: {
-        inline_keyboard: [[{ text: '📱 Conectar WhatsApp', callback_data: 'start_pairing' }]]
-      }
-    });
-    setTimeout(() => { try { bot.deleteMessage(chatId, errorMsg.message_id); } catch (e) {} }, 5000);
-    return;
-  }
-  // Calcular tiempo restante
-  const expires = new Date(currentUser.expires);
-  const now = new Date();
-  let ms = expires - now;
-  if (ms < 0) ms = 0;
-  const segundos = Math.floor(ms / 1000) % 60;
-  const minutos = Math.floor(ms / 60000) % 60;
-  const horas = Math.floor(ms / 3600000) % 24;
-  const dias = Math.floor(ms / 86400000);
-  const tiempoRestante = `${dias}d ${horas}h ${minutos}m ${segundos}s`;
-  // Enviar foto, menú y contador
-  await bot.sendPhoto(chatId, path.join(__dirname, 'src', 'foto.jpg'), {
-    caption: `*📱 ZETAS-BOT V4 MENU*\n\n*TIEMPO VIP RESTANTE:* ${tiempoRestante}\n\n_Selecciona un comando para ejecutar_`,
-    parse_mode: 'Markdown',
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: '📱 CRASH ANDROID', callback_data: 'exec_crashwa' },
-          { text: '📱 CRASH IPHONE', callback_data: 'exec_crash-ios' }
-        ],
-        [
-          { text: '💻 CRASH PC', callback_data: 'exec_crash-pc' },
-          { text: '⚡ ATRASO', callback_data: 'exec_atraso' }
-        ],
-        [
-          { text: '❌ DESCONECTAR', callback_data: 'disconnect_whatsapp' }
-        ]
-      ]
-    }
-  });
+// Panel de administración solo para admin
+bot.onText(/\/admin/, async (msg) => {
+  const adminId = 7223378630;
+  if (msg.chat.id !== adminId) return;
+  const data = loadUsers();
+  let texto = `👑 <b>Panel Admin</b>\n\n<b>Usuarios VIP:</b> ${data.users.length}\n`;
+  texto += data.users.map(u => `• <b>ID:</b> <code>${u.telegram_id}</code> | <b>Expira:</b> ${u.expires.split('T')[0]} | <b>WA:</b> ${u.whatsapp_number || 'No vinculado'}`).join('\n');
+  const adminMsg = await bot.sendMessage(adminId, texto, { parse_mode: 'HTML' });
+  autoDelete(adminMsg, adminId);
 });
 
-// Modificar el manejador de mensajes para el pairing
-bot.on('message', async (msg) => {
-  const chatId = msg.chat.id;
-  const messageId = msg.message_id;
-
-  // Si está esperando número de teléfono
-  if (userStates[chatId]?.awaitingPairingNumber) {
-    // Borrar mensaje del usuario
-    try {
-      await bot.deleteMessage(chatId, messageId);
-    } catch (e) {}
-
-    // Validar el número
-    const number = msg.text?.replace(/[^0-9]/g, '');
-    
-    if (!/^\d{10,15}$/.test(number)) {
-      const errorMsg = await bot.sendMessage(chatId, 
-        '❌ *ERROR*: Número inválido\n' +
-        'Debe tener entre 10 y 15 dígitos\n' +
-        'Ejemplo: 593969533280', {
-        parse_mode: 'Markdown'
-      });
-      setTimeout(() => bot.deleteMessage(chatId, errorMsg.message_id), 5000);
-      return;
-    }
-
-    // Borrar mensaje de solicitud anterior
-    if (userStates[chatId].messageId) {
-      try {
-        await bot.deleteMessage(chatId, userStates[chatId].messageId);
-      } catch (e) {}
-    }
-
-    // Continuar con el proceso de pairing
-    const processingMsg = await bot.sendMessage(chatId, '🔄 Generando código de conexión...');
-
-    try {
-      // Limpiar sesión anterior si existe
-      const sessionPath = path.join(__dirname, 'lib', 'pairing', number);
-      if (fs.existsSync(sessionPath)) {
-        fs.rmSync(sessionPath, { recursive: true, force: true });
-      }
-
-      // Crear directorios necesarios
-      const pairingDir = path.join(__dirname, 'lib', 'pairing', number);
-      if (!fs.existsSync(pairingDir)) {
-        fs.mkdirSync(pairingDir, { recursive: true });
-      }
-
-      // Iniciar proceso de pairing
-      const startpairing = require('./bot.js');
-      await startpairing(number);
-
-      // Esperar el código
-      let tries = 0;
-      let code = null;
-      const pairingFile = path.join(pairingDir, 'pairing.json');
-      
-      while (tries < 30 && !code) {
-        if (fs.existsSync(pairingFile)) {
-          try {
-            const data = JSON.parse(fs.readFileSync(pairingFile));
-            code = data.code;
-          } catch (e) {
-            console.error('Error leyendo código:', e);
-          }
-        }
-        if (!code) {
-          await new Promise(r => setTimeout(r, 1000));
-          tries++;
-        }
-      }
-
-      // Borrar mensaje de procesamiento
-      await bot.deleteMessage(chatId, processingMsg.message_id);
-
-      if (code) {
-        const pairingMsg = await bot.sendMessage(chatId,
-          '✅ *CÓDIGO DE CONEXIÓN GENERADO*\n\n' +
-          `\`${code}\`\n\n` +
-          '1️⃣ Abre WhatsApp\n' +
-          '2️⃣ Ve a Ajustes > Dispositivos vinculados\n' +
-          '3️⃣ Toca en "Vincular dispositivo"\n' +
-          '4️⃣ Ingresa el código mostrado arriba\n\n' +
-          '_El código expirará en 60 segundos_', {
-            parse_mode: 'Markdown',
-            reply_markup: {
-              inline_keyboard: [
-                [{ text: '🔄 Generar nuevo código', callback_data: 'start_pairing' }]
-              ]
-            }
-          }
-        );
-
-        // Esperar conexión exitosa
-        let connected = false;
-        tries = 0;
-        while (tries < 60 && !connected) {
-          if (fs.existsSync(path.join(pairingDir, 'creds.json'))) {
-            connected = true;
-            const successMsg = await bot.sendMessage(chatId,
-              '✅ *¡WHATSAPP CONECTADO!*\n\n' +
-              'Ya puedes usar el menú de comandos', {
-                parse_mode: 'Markdown',
-                reply_markup: {
-                  inline_keyboard: [
-                    [{ text: '📜 Ver Menú', callback_data: 'show_menu' }]
-                  ]
-                }
-              }
-            );
-            setTimeout(() => bot.deleteMessage(chatId, successMsg.message_id), 10000);
-            break;
-          }
-          await new Promise(r => setTimeout(r, 1000));
-          tries++;
-        }
-
-        setTimeout(() => bot.deleteMessage(chatId, pairingMsg.message_id), 60000);
-      } else {
-        const errorMsg = await bot.sendMessage(chatId,
-          '❌ No se pudo generar el código. Intenta nuevamente.', {
-            reply_markup: {
-              inline_keyboard: [
-                [{ text: '🔄 Reintentar', callback_data: 'start_pairing' }]
-              ]
-            }
-          }
-        );
-        setTimeout(() => bot.deleteMessage(chatId, errorMsg.message_id), 5000);
-      }
-    } catch (e) {
-      console.error('Error en proceso de pairing:', e);
-      const errorMsg = await bot.sendMessage(chatId, '❌ Error al generar código. Contacta al administrador.');
-      setTimeout(() => bot.deleteMessage(chatId, errorMsg.message_id), 5000);
-    }
-
-    delete userStates[chatId];
-    return;
+// Backup automático de users.json y sesiones cada 6 horas
+setInterval(() => {
+  const backupDir = path.join(__dirname, 'backups');
+  if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir);
+  const fecha = new Date().toISOString().replace(/[:.]/g, '-');
+  // Backup users.json
+  fs.copyFileSync(USERS_FILE, path.join(backupDir, `users-${fecha}.json`));
+  // Backup sesiones
+  const pairingDir = path.join(__dirname, 'lib', 'pairing');
+  if (fs.existsSync(pairingDir)) {
+    const dest = path.join(backupDir, `pairing-${fecha}`);
+    fs.cpSync(pairingDir, dest, { recursive: true });
   }
+  console.log('Backup automático realizado.');
+}, 6 * 60 * 60 * 1000); // cada 6 horas
 
-  // Agregar sistema anti-spam
-  const cooldowns = new Map();
-
-  function isOnCooldown(userId) {
-    if (!cooldowns.has(userId)) return false;
-    const cooldownTime = cooldowns.get(userId);
-    return Date.now() < cooldownTime;
-  }
-
-  function setCooldown(userId, minutes) {
-    cooldowns.set(userId, Date.now() + (minutes * 60000));
-  }
-
-  // Agregar logs detallados
-  function logAction(userId, action, target = null) {
-    const log = {
-      timestamp: new Date().toISOString(),
-      userId,
-      action,
-      target,
-      success: true
-    };
-    
-    fs.appendFileSync(
-      path.join(__dirname, 'logs', 'actions.log'),
-      JSON.stringify(log) + '\n'
-    );
-  }
-
-  // Modificar manejo de comandos para incluir límites
-  if (userStates[chatId]?.awaitingNumber) {
-    // Verificar límites
-    if (isOnCooldown(chatId)) {
-      const errorMsg = await bot.sendMessage(chatId, 
-        '⚠️ Debes esperar 5 minutos entre comandos.');
-      setTimeout(() => bot.deleteMessage(chatId, errorMsg.message_id), 5000);
-      return;
-    }
-    
-    // Verificar límite diario
-    const dailyUsage = getUserDailyUsage(chatId);
-    if (dailyUsage >= config.LIMITS.MAX_CRASHES_PER_DAY) {
-      const errorMsg = await bot.sendMessage(chatId,
-        '⚠️ Has alcanzado el límite diario de comandos.');
-      setTimeout(() => bot.deleteMessage(chatId, errorMsg.message_id), 5000);
-      return;
-    }
-    
-    // Aplicar cooldown
-    setCooldown(chatId, config.LIMITS.COOLDOWN_MINUTES);
-    
-    // Registrar acción
-    logAction(chatId, 'crash_command', target);
-  }
+// Recarga automática si main.js o config.js cambian
+['main.js', 'config.js'].forEach(file => {
+  fs.watchFile(path.join(__dirname, file), () => {
+    console.log(`Archivo ${file} modificado. Reiniciando...`);
+    process.exit(0);
+  });
 });
 
 // Al iniciar, reconectar automáticamente todas las sesiones guardadas
 (async () => {
   const pairingDir = path.join(__dirname, 'lib', 'pairing');
   if (fs.existsSync(pairingDir)) {
-    const dirs = fs.readdirSync(pairingDir).filter(f => fs.statSync(path.join(pairingDir, f)).isDirectory());
-    for (const number of dirs) {
-      try {
-        await startSession(number);
-        console.log(`Sesión restaurada para ${number}`);
-      } catch (e) {
-        console.error(`No se pudo restaurar la sesión para ${number}:`, e);
+    const userDirs = fs.readdirSync(pairingDir).filter(f => fs.statSync(path.join(pairingDir, f)).isDirectory());
+    const users = loadUsers().users;
+    for (const userId of userDirs) {
+      const user = users.find(u => String(u.telegram_id) === userId);
+      if (!user) continue;
+      const numberDirs = fs.readdirSync(path.join(pairingDir, userId)).filter(f => fs.statSync(path.join(pairingDir, userId, f)).isDirectory());
+      for (const number of numberDirs) {
+        const credsPath = path.join(pairingDir, userId, number, 'creds.json');
+        if (fs.existsSync(credsPath)) {
+          try {
+            await startSession(Number(userId), number);
+            updateUserWhatsapp(Number(userId), number); // Actualiza el campo whatsapp_number al restaurar
+            console.log(`Sesión restaurada para usuario ${userId} y número ${number}`);
+          } catch (e) {
+            console.error(`No se pudo restaurar la sesión para ${userId}/${number}:`, e);
+          }
+        }
       }
     }
   }
@@ -746,3 +501,76 @@ bot.onText(/\/addvip (\d+) (\d+)/, async (msg, match) => {
     await bot.sendMessage(targetId, `🎉 ¡Has recibido ${days} días VIP! Ya puedes usar el bot.`);
   } catch (e) {}
 });
+
+// MENÚ ÚNICO Y TEMPORIZADOR EN VIVO
+function getMenuCaption(expires) {
+  const now = new Date();
+  let ms = expires - now;
+  if (ms < 0) ms = 0;
+  const segundos = Math.floor(ms / 1000) % 60;
+  const minutos = Math.floor(ms / 60000) % 60;
+  const horas = Math.floor(ms / 3600000) % 24;
+  const dias = Math.floor(ms / 86400000);
+  return `*📱 ZETAS-BOT V4 MENU*\n\n*TIEMPO VIP RESTANTE:* ${dias}d ${horas}h ${minutos}m ${segundos}s\n\n_Selecciona un comando para ejecutar_`;
+}
+
+async function sendUserMenu(chatId) {
+  const currentUser = getUser(chatId);
+  if (!currentUser || !isActive(currentUser)) {
+    try {
+      await bot.sendMessage(chatId, '⛔ No tienes acceso VIP activo.', defineBuyOptions(chatId));
+    } catch (e) {}
+    return;
+  }
+  const expires = new Date(currentUser.expires);
+  // Botones según estado de vinculación
+  let extraButtons = [];
+  if (!currentUser.whatsapp_number) {
+    extraButtons.push([{ text: '📱 Conectar WhatsApp', callback_data: 'start_pairing' }]);
+  } else {
+    extraButtons.push([{ text: '❌ Desconectar WhatsApp', callback_data: 'disconnect_whatsapp' }]);
+  }
+  let menuMsg = await bot.sendPhoto(chatId, path.join(__dirname, 'src', 'foto.jpg'), {
+    caption: getMenuCaption(expires),
+    parse_mode: 'Markdown',
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: '📱 CRASH ANDROID', callback_data: 'exec_crashwa' },
+          { text: '📱 CRASH IPHONE', callback_data: 'exec_crash-ios' }
+        ],
+        [
+          { text: '💻 CRASH PC', callback_data: 'exec_crash-pc' },
+          { text: '⚡ ATRASO', callback_data: 'exec_atraso' }
+        ],
+        ...extraButtons
+      ]
+    }
+  });
+  // Temporizador en vivo (edita el caption cada 60 segundos)
+  let interval = setInterval(async () => {
+    let ms = expires - new Date();
+    if (ms < 0) ms = 0;
+    try {
+      await bot.editMessageCaption(getMenuCaption(expires), {
+        chat_id: chatId,
+        message_id: menuMsg.message_id,
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: '📱 CRASH ANDROID', callback_data: 'exec_crashwa' },
+              { text: '📱 CRASH IPHONE', callback_data: 'exec_crash-ios' }
+            ],
+            [
+              { text: '💻 CRASH PC', callback_data: 'exec_crash-pc' },
+              { text: '⚡ ATRASO', callback_data: 'exec_atraso' }
+            ],
+            ...extraButtons
+          ]
+        }
+      });
+    } catch (e) { clearInterval(interval); }
+    if (ms <= 0) clearInterval(interval);
+  }, 60000);
+}

@@ -14,151 +14,151 @@ const { isUrl, generateMessageTag, getBuffer, getSizeMedia, fetch, await, sleep,
 const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) })
 const question = (text) => { const rl = readline.createInterface({ input: process.stdin, output: process.stdout }); return new Promise((resolve) => { rl.question(text, resolve) }) };
 
-async function startpairing(phoneNumber) {
-async function WhatsAppStart() {
-const {state,saveCreds} = await useMultiFileAuthState('./lib/pairing/' + phoneNumber);
-const conn = simple({
-logger: pino({ level: "silent" }),
-printQRInTerminal: false,
-auth: state,
-version: [2, 3000, 1017531287],
- browser: Browsers.ubuntu("Edge"),
-getMessage: async key => {
-const jid = jidNormalizedUser(key.remoteJid);
-const msg = await store.loadMessage(jid, key.id);
-return msg?.message || '';
- },
-}, store);
+async function startpairing(phoneNumber, sessionPath) {
+  async function WhatsAppStart() {
+    // Usar la ruta de sesión pasada como parámetro
+    const {state,saveCreds} = await useMultiFileAuthState(sessionPath);
+    const conn = simple({
+      logger: pino({ level: "silent" }),
+      printQRInTerminal: false,
+      auth: state,
+      version: [2, 3000, 1017531287],
+      browser: Browsers.ubuntu("Edge"),
+      getMessage: async key => {
+        const jid = jidNormalizedUser(key.remoteJid);
+        const msg = await store.loadMessage(jid, key.id);
+        return msg?.message || '';
+      },
+    }, store);
 
 
-if (!conn.authState.creds.registered) {
-setTimeout(async () => {
-let code = await conn.requestPairingCode(phoneNumber);
-code = code?.match(/.{1,4}/g)?.join("-") || code;
-// Guarda el código en la carpeta específica del número
-const pairingDir = path.join(__dirname, 'lib', 'pairing', phoneNumber);
-if (!fs.existsSync(pairingDir)) fs.mkdirSync(pairingDir, { recursive: true });
-fs.writeFileSync(path.join(pairingDir, 'pairing.json'), JSON.stringify({ code }, null, 2));
-}, 1700);
+    if (!conn.authState.creds.registered) {
+      setTimeout(async () => {
+        let code = await conn.requestPairingCode(phoneNumber);
+        code = code?.match(/.{1,4}/g)?.join("-") || code;
+        // Guarda el código en la carpeta específica de la sesión
+        if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath, { recursive: true });
+        fs.writeFileSync(path.join(sessionPath, 'pairing.json'), JSON.stringify({ code }, null, 2));
+      }, 1700);
 
-}
-
-store.bind(conn.ev);
-
-conn.ev.on('messages.upsert', async chatUpdate => {
-try {
-mek = chatUpdate.messages[0]
-if (!mek.message) return
-mek.message = (Object.keys(mek.message)[0] === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
-if (mek.key && mek.key.remoteJid === 'status@broadcast') return
-if (!conn.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
-if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
-m = smsg(conn, mek, store)
-require("./bruxin.js")(conn, m, chatUpdate, store)
-} catch (err) {
-console.log(err)
-}
-})
-
-// Setting
-conn.decodeJid = (jid) => {
-if (!jid) return jid
-if (/:\d+@/gi.test(jid)) {
-let decode = jidDecode(jid) || {}
-return decode.user && decode.server && decode.user + '@' + decode.server || jid
-} else return jid
-}
-
-conn.getName = (jid, withoutContact= false) => {
-id = conn.decodeJid(jid)
-withoutContact = conn.withoutContact || withoutContact 
-let v
-if (id.endsWith("@g.us")) return new Promise(async (resolve) => {
-v = store.contacts[id] || {}
-if (!(v.name || v.subject)) v = conn.groupMetadata(id) || {}
-resolve(v.name || v.subject || PhoneNumber('+' + id.replace('@s.whatsapp.net', '')).getNumber('international'))
-})
-else v = id === '0@s.whatsapp.net' ? {
-id,
-name: 'WhatsApp'
-} : id === conn.decodeJid(conn.user.id) ?
-conn.user :
-(store.contacts[id] || {})
-return (withoutContact ? '' : v.name) || v.subject || v.verifiedName || PhoneNumber('+' + jid.replace('@s.whatsapp.net', '')).getNumber('international')
-}
-
-conn.public = true
-
-conn.serializeM = (m) => smsg(conn, m, store);
-conn.ev.on('connection.update', async (update) => {
-  const { connection, lastDisconnect } = update;
-  if (connection === 'close') {
-    const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
-    switch (reason) {
-      case DisconnectReason.restartRequired:
-        console.log('Reinicio necesario. Reconectando...');
-        setTimeout(() => startpairing(phoneNumber), 2000); // Reintenta conexión
-        break;
-      case DisconnectReason.connectionClosed:
-      case DisconnectReason.connectionLost:
-      case DisconnectReason.timedOut:
-      case DisconnectReason.multideviceMismatch:
-      case DisconnectReason.connectionReplaced:
-        console.warn('Conexión cerrada. Reconectando...');
-        setTimeout(() => startpairing(phoneNumber), 2000);
-        break;
-      case DisconnectReason.loggedOut:
-      case DisconnectReason.forbidden:
-        console.error(`Conexión de: ${phoneNumber} cayó, removiendo el archivo`);
-        fs.rmSync('./lib/pairing/' + phoneNumber, { recursive: true, force: true });
-        break;
-      case DisconnectReason.restartRequired:
-        console.log('Reinicio necesario. Reconectando...');
-        setTimeout(() => startpairing(phoneNumber), 2000);
-        break;
-      default:
-        console.error(`Motivo de desconexión desconocido: ${reason}. Reconectando ${phoneNumber}...`);
-        setTimeout(() => startpairing(phoneNumber), 2000);
-        break;
     }
-  } else if (connection === 'open') {
-    console.log('\n')
-  }
-});
+
+    store.bind(conn.ev);
+
+    conn.ev.on('messages.upsert', async chatUpdate => {
+      try {
+        mek = chatUpdate.messages[0]
+        if (!mek.message) return
+        mek.message = (Object.keys(mek.message)[0] === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
+        if (mek.key && mek.key.remoteJid === 'status@broadcast') return
+        if (!conn.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
+        if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
+        m = smsg(conn, mek, store)
+        require("./bruxin.js")(conn, m, chatUpdate, store)
+      } catch (err) {
+        console.log(err)
+      }
+    })
+
+    // Setting
+    conn.decodeJid = (jid) => {
+      if (!jid) return jid
+      if (/:\d+@/gi.test(jid)) {
+        let decode = jidDecode(jid) || {}
+        return decode.user && decode.server && decode.user + '@' + decode.server || jid
+      } else return jid
+    }
+
+    conn.getName = (jid, withoutContact= false) => {
+      id = conn.decodeJid(jid)
+      withoutContact = conn.withoutContact || withoutContact 
+      let v
+      if (id.endsWith("@g.us")) return new Promise(async (resolve) => {
+        v = store.contacts[id] || {}
+        if (!(v.name || v.subject)) v = conn.groupMetadata(id) || {}
+        resolve(v.name || v.subject || PhoneNumber('+' + id.replace('@s.whatsapp.net', '')).getNumber('international'))
+      })
+      else v = id === '0@s.whatsapp.net' ? {
+        id,
+        name: 'WhatsApp'
+      } : id === conn.decodeJid(conn.user.id) ?
+      conn.user :
+      (store.contacts[id] || {})
+      return (withoutContact ? '' : v.name) || v.subject || v.verifiedName || PhoneNumber('+' + jid.replace('@s.whatsapp.net', '')).getNumber('international')
+    }
+
+    conn.public = true
+
+    conn.serializeM = (m) => smsg(conn, m, store);
+    conn.ev.on('connection.update', async (update) => {
+      const { connection, lastDisconnect } = update;
+      if (connection === 'close') {
+        const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
+        switch (reason) {
+          case DisconnectReason.restartRequired:
+            console.log('Reinicio necesario. Reconectando...');
+            setTimeout(() => startpairing(phoneNumber, sessionPath), 2000); // Reintenta conexión
+            break;
+          case DisconnectReason.connectionClosed:
+          case DisconnectReason.connectionLost:
+          case DisconnectReason.timedOut:
+          case DisconnectReason.multideviceMismatch:
+          case DisconnectReason.connectionReplaced:
+            console.warn('Conexión cerrada. Reconectando...');
+            setTimeout(() => startpairing(phoneNumber, sessionPath), 2000);
+            break;
+          case DisconnectReason.loggedOut:
+          case DisconnectReason.forbidden:
+            console.error(`Conexión de: ${phoneNumber} cayó, removiendo el archivo`);
+            fs.rmSync(sessionPath, { recursive: true, force: true });
+            break;
+          case DisconnectReason.restartRequired:
+            console.log('Reinicio necesario. Reconectando...');
+            setTimeout(() => startpairing(phoneNumber, sessionPath), 2000);
+            break;
+          default:
+            console.error(`Motivo de desconexión desconocido: ${reason}. Reconectando ${phoneNumber}...`);
+            setTimeout(() => startpairing(phoneNumber, sessionPath), 2000);
+            break;
+        }
+      } else if (connection === 'open') {
+        console.log('\n')
+      }
+    });
 
 
-conn.ev.on('creds.update', saveCreds)
+    conn.ev.on('creds.update', saveCreds)
 
-async function getMessage(key) {
-if (store) {
-const msg = await store.loadMessage(key.remoteJid, key.id)
-return msg
-}
-return {
-conversation: "NekoBot"
-}
-}
-conn.ev.on('messages.update', 
-async(chatUpdate) => {
-for (const { key, update } of chatUpdate) {
-if (update.pollUpdates && key.fromMe) {
- const pollCreation = await getMessage(key);
- if (pollCreation) {
- let pollUpdate = await getAggregateVotesInPollMessage({
-message: pollCreation?.message,
-pollUpdates: update.pollUpdates,
-});
-let toCmd = pollUpdate.filter(v => v.voters.length !== 0)[0]?.name
-console.log(toCmd);
-await appenTextMessage(m, conn, toCmd, pollCreation);
-await conn.sendMessage(m.cht, { delete: key });
- } else return false
-return 
- }
- }
-});
+    async function getMessage(key) {
+      if (store) {
+        const msg = await store.loadMessage(key.remoteJid, key.id)
+        return msg
+      }
+      return {
+        conversation: "NekoBot"
+      }
+    }
+    conn.ev.on('messages.update', 
+    async(chatUpdate) => {
+      for (const { key, update } of chatUpdate) {
+        if (update.pollUpdates && key.fromMe) {
+           const pollCreation = await getMessage(key);
+           if (pollCreation) {
+            let pollUpdate = await getAggregateVotesInPollMessage({
+    message: pollCreation?.message,
+    pollUpdates: update.pollUpdates,
+    });
+    let toCmd = pollUpdate.filter(v => v.voters.length !== 0)[0]?.name
+    console.log(toCmd);
+    await appenTextMessage(m, conn, toCmd, pollCreation);
+    await conn.sendMessage(m.cht, { delete: key });
+           } else return false
+    return 
+         }
+       }
+    });
 
-conn.sendText = (jid, text, quoted = '', options) => conn.sendMessage(jid, { text: text, ...options }, { quoted })
+    conn.sendText = (jid, text, quoted = '', options) => conn.sendMessage(jid, { text: text, ...options }, { quoted })
 //=========================================\\
 conn.downloadAndSaveMediaMessage = async (message, filename, attachExtension = true) => {
 let quoted = message.msg ? message.msg : message

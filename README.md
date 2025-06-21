@@ -1,29 +1,37 @@
 # Zetas-Bot V4
 
-Bot de Telegram + WhatsApp para servicios VIP.
+Bot de WhatsApp multiusuario con control desde Telegram.
 
-## Características
+## Características principales
+- Vinculación de WhatsApp por usuario VIP
+- Panel de administración para ver usuarios y sesiones
+- Backups automáticos de usuarios y sesiones cada 6 horas
+- Recarga automática si se modifica main.js o config.js
+- Menú con foto, tiempo VIP y comandos exclusivos
 
-- Sistema de usuarios VIP con diferentes planes
-- Conexión múltiple de WhatsApp 
-- Sistema anti-spam y límites de uso
-- Comandos especiales para usuarios VIP
-- Interfaz intuitiva con botones
+## Estructura de carpetas
+- `main.js`: Lógica principal del bot
+- `config.js`: Configuración y límites
+- `lib/pairing/<id>/<numero>`: Sesiones de WhatsApp por usuario y número
+- `backups/`: Copias de seguridad automáticas
 
-## Instalación
+## Comandos principales
+- `/start`: Inicia el bot y muestra opciones
+- `/menu`: Muestra el menú de comandos
+- `/admin`: Panel solo para admin (ver usuarios y sesiones)
+- `/addvip <id> <días>`: Otorga días VIP a un usuario (solo admin)
 
-1. Clonar el repositorio
-2. Instalar dependencias: `npm install`
-3. Configurar variables de entorno
-4. Ejecutar: `node main.js`
+## Requisitos
+- Node.js 18+
+- Archivo users.json (se crea automáticamente)
 
-## Planes VIP
+## Notas
+- El bot se reinicia automáticamente si editas main.js o config.js
+- Los backups se guardan en la carpeta backups/
+- El sistema anti-spam está desactivado
 
-- 1 día: $5
-- 7 días: $25 
-- 30 días: $80
-- 365 días: $800
+---
 
-## Soporte
+¿Dudas? Contacta al admin en Telegram.
 
-Contacto: wa.me/593969533280
+By : 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘 & 『0x48𝙴𝚡𝙼𝚊𝚜𝚝𝚎𝚛』
