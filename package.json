@@ -15,6 +15,7 @@
     "cloudscraper": "^4.6.0",
     "crypto": "^1.0.1",
     "didyoumean": "^1.2.2",
+    "dotenv": "^16.5.0",
     "fs": "0.0.1-security",
     "fs-extra": "^10.0.0",
     "human-readable": "^0.2.1",
@@ -30,6 +31,7 @@
     "pino": "^7.0.5",
     "randomstring": "^1.3.0",
     "similarity": "^1.2.1",
+    "sqlite3": "^5.1.7",
     "string-similarity": "^4.0.4",
     "util": "^0.12.5",
     "webcrack": "latest",
@@ -38,7 +40,9 @@
   "scripts": {
     "whatsapp": "node index.js",
     "telegram": "node telegram-bot.js",
-    "start-all": "npm-run-all --parallel whatsapp telegram"
+    "start-all": "npm-run-all --parallel whatsapp telegram",
+    "start": "node main.js",
+    "pm2": "pm2 start main.js --name zetas-bot -f"
   },
   "author": "@srbruxomp5",
   "license": "ISC"
