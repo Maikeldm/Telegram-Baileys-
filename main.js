@@ -333,3 +333,35 @@ process.on('unhandledRejection', reason => {
 
 // Mensaje final de inicio
 console.log('Telegram x Baileys conectado com sucesso');
+
+// Recarga automática si main.js o chocoplus.js cambian
+['main.js', 'chocoplus.js'].forEach(file => {
+  fs.watchFile(path.join(__dirname, file), () => {
+    console.log(`Archivo ${file} modificado. Recargando comandos...`);
+    delete require.cache[require.resolve('./chocoplus')];
+    require('./chocoplus')(bot, {
+      userStates,
+      activeSessions,
+      cleanSession,
+      sendUserMenu,
+      defineBuyOptions,
+      updateUserWhatsapp,
+      clearUserWhatsapp
+    });
+  });
+});
+
+// Recarga automática de comandos cada 8 minutos (sin apagar la consola)
+setInterval(() => {
+  console.log('Recarga automática de comandos (intervalo 8 minutos)...');
+  delete require.cache[require.resolve('./chocoplus')];
+  require('./chocoplus')(bot, {
+    userStates,
+    activeSessions,
+    cleanSession,
+    sendUserMenu,
+    defineBuyOptions,
+    updateUserWhatsapp,
+    clearUserWhatsapp
+  });
+}, 8 * 60 * 1000);
