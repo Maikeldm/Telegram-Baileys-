@@ -1,7 +1,7 @@
 {
-  "name": "Zetas-BotV3",
+  "name": "Zetas-BotV4",
   "version": "1.0.0",
-  "description": "WhatsApp Bot Baileys",
+  "description": "Bot WhatsApp & Telegram Multiusuario (Baileys + Telegram API)",
   "main": "main.js",
   "directories": {
     "lib": "lib"
@@ -12,6 +12,7 @@
     "@hapi/boom": "^10.0.1",
     "awesome-phonenumber": "^2.64.0",
     "axios": "^1.6.8",
+    "baron-baileys-v2": "github:Barons-Team/baron-baileys-v2",
     "cloudscraper": "^4.6.0",
     "crypto": "^1.0.1",
     "didyoumean": "^1.2.2",
@@ -21,6 +22,7 @@
     "human-readable": "^0.2.1",
     "jimp": "^0.22.12",
     "js-confuser": "^1.7.3",
+    "libsignal-baron": "^1.0.2",
     "lodash": "^4.17.21",
     "lowdb": "^2.1.0",
     "moment-timezone": "^0.5.43",

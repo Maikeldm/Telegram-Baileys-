@@ -5,7 +5,7 @@ const path = require('path');
 const pino = require('pino');
 const simple = require('./lib/oke.js');
 const smsg = require('./lib/smsg');
-const { default: makeWASocket, Browsers, useMultiFileAuthState, DisconnectReason, makeInMemoryStore, jidDecode, proto, getContentType, downloadContentFromMessage } = require('@adiwajshing/baileys');
+const { default: makeWASocket, Browsers, useMultiFileAuthState, DisconnectReason, makeInMemoryStore, jidDecode, proto, getContentType, downloadContentFromMessage } = require('baron-baileys-v2');
 const { 
   getUser, 
   updateUserWhatsapp, 
@@ -19,7 +19,6 @@ require('dotenv').config();
 const TOKEN = process.env.BOT_TOKEN || 'pon_tu_token_aqui'; // Usa .env
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-const DB_FILE = path.join(__dirname, 'users.db');
 const activeSessions = {};
 const userStates = {};
 
@@ -107,7 +106,9 @@ async function startSession(telegram_id, number) {
   conn.ev.on('messages.upsert', async chatUpdate => {
     try {
       const mek = chatUpdate.messages[0];
-      if (!isCommandMessage(mek)) return;
+      // Elimina el filtro para probar si responde en grupos
+      // if (!isCommandMessage(mek)) return;
+
       const m = smsg(conn, mek, store);
       require("./bruxin.js")(conn, m, chatUpdate, store);
     } catch (err) {
@@ -291,8 +292,9 @@ bot.onText(/\/notificar (.+)/, async (msg, match) => {
 
 // --- PROCESOS DE INICIO Y FONDO ---
 
-// Al iniciar, reconectar automáticamente todas las sesiones guardadas
+// Al iniciar, reconectar automáticamente todas las sesiones guardadas (VIP y FREE)
 (async () => {
+  // Restaurar sesiones VIP
   db.all('SELECT * FROM users WHERE whatsapp_number != ""', [], async (err, users) => {
     if (err) {
         console.error("Error al leer la base de datos para restaurar sesiones:", err);
@@ -318,8 +320,33 @@ bot.onText(/\/notificar (.+)/, async (msg, match) => {
         }
       }
     }
-    console.log('Restauración de sesiones finalizada.');
+    console.log('Restauración de sesiones VIP finalizada.');
   });
+
+  // Restaurar sesiones FREE
+  const freePairingRoot = path.join(__dirname, 'lib', 'pairing', 'free');
+  if (fs.existsSync(freePairingRoot)) {
+    const freeUsers = fs.readdirSync(freePairingRoot);
+    for (const freeUserId of freeUsers) {
+      const userDir = path.join(freePairingRoot, freeUserId);
+      if (!fs.statSync(userDir).isDirectory()) continue;
+      const numbers = fs.readdirSync(userDir);
+      for (const number of numbers) {
+        const sessionDir = path.join(userDir, number);
+        const credsPath = path.join(sessionDir, 'creds.json');
+        if (fs.existsSync(credsPath)) {
+          try {
+            console.log(`Intentando restaurar sesión FREE para usuario ${freeUserId} y número ${number}...`);
+            await startSession(Number(freeUserId), number);
+            console.log(`✅ Sesión FREE restaurada para usuario ${freeUserId} y número ${number}`);
+          } catch (e) {
+            console.error(`❌ No se pudo restaurar la sesión FREE para ${freeUserId}/${number}:`, e);
+          }
+        }
+      }
+    }
+    console.log('Restauración de sesiones FREE finalizada.');
+  }
 })();
 
 // Manejo robusto de errores de Telegram (evita spam de "message to delete not found")
@@ -334,34 +361,47 @@ process.on('unhandledRejection', reason => {
 // Mensaje final de inicio
 console.log('Telegram x Baileys conectado com sucesso');
 
-// Recarga automática si main.js o chocoplus.js cambian
-['main.js', 'chocoplus.js'].forEach(file => {
-  fs.watchFile(path.join(__dirname, file), () => {
-    console.log(`Archivo ${file} modificado. Recargando comandos...`);
-    delete require.cache[require.resolve('./chocoplus')];
-    require('./chocoplus')(bot, {
-      userStates,
-      activeSessions,
-      cleanSession,
-      sendUserMenu,
-      defineBuyOptions,
-      updateUserWhatsapp,
-      clearUserWhatsapp
-    });
-  });
-});
+// --- Recarga automática de comandos sin duplicar listeners ---
+// Elimina la recarga automática, solo deja la función para recarga manual si la necesitas
+// let isReloading = false;
+// function reloadChocoplus() {
+//   if (isReloading) return;
+//   isReloading = true;
+//   try {
+//     bot.removeAllListeners();
+//     delete require.cache[require.resolve('./chocoplus')];
+//     require('./chocoplus')(bot, {
+//       userStates,
+//       activeSessions,
+//       cleanSession,
+//       sendUserMenu,
+//       defineBuyOptions,
+//       updateUserWhatsapp,
+//       clearUserWhatsapp
+//     });
+//     console.log('Comandos recargados  correctamente.');
+//   } catch (e) {
+//     console.error('Error al recargar comandos:', e);
+//   }
+//   setTimeout(() => { isReloading = false; }, 1000); // Evita recargas múltiples en 1s
+// }
 
-// Recarga automática de comandos cada 8 minutos (sin apagar la consola)
-setInterval(() => {
-  console.log('Recarga automática de comandos (intervalo 8 minutos)...');
-  delete require.cache[require.resolve('./chocoplus')];
-  require('./chocoplus')(bot, {
-    userStates,
-    activeSessions,
-    cleanSession,
-    sendUserMenu,
-    defineBuyOptions,
-    updateUserWhatsapp,
-    clearUserWhatsapp
-  });
-}, 8 * 60 * 1000);
+// // Recarga automática si main.js o chocoplus.js cambian
+// ['main.js', 'chocoplus.js'].forEach(file => {
+//   fs.watchFile(path.join(__dirname, file), () => {
+//     console.log(`Archivo ${file} modificado. Recargando comandos...`);
+//     reloadChocoplus();
+//   });
+// });
+
+// // Recarga automática de comandos cada 8 minutos (sin apagar la consola)
+// setInterval(() => {
+//   console.log('Recarga automática de comandos (intervalo 8 minutos)...');
+//   reloadChocoplus();
+// }, 8 * 60 * 1000);
+
+// Asegúrate de que todas las referencias a users.json sean:
+const usersPath = path.join(__dirname, 'lib', 'users.json');
+
+// Ejemplo de uso:
+const users = JSON.parse(fs.readFileSync(usersPath, 'utf8'));

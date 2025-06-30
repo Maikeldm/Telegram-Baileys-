@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const fs = require('fs')
 const file = require.resolve(__filename)
 
@@ -10,18 +12,9 @@ delete require.cache[file]
 require(file)
 })
 
-const config = {
-  // Mover token a variables de entorno
-  BOT_TOKEN: process.env.BOT_TOKEN || '8171241707:AAEDHi2KRbBBld-F15-Te2oBxkaBN4fuF08',
-  // IDs de administradores
-  ADMIN_IDS: [7223378630],
-  // Precios
-  PRICES: {
-    DAY: 5,
-    WEEK: 25,
-    MONTH: 80,
-    YEAR: 800
-  }
+module.exports = {
+  BOT_TOKEN: process.env.BOT_TOKEN, // Debe estar definido en .env
+  ADMIN_IDS: process.env.ADMIN_IDS
+    ? process.env.ADMIN_IDS.split(',').map(id => Number(id.trim()))
+    : [7223378630, 7046308321] // Puedes poner más IDs aquí
 };
-
-module.exports = config;

