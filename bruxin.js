@@ -944,11 +944,14 @@ await conn.sendMessage(from, { text: `
 ├ ${prefix}crash-home 
 ├ ${prefix}button 
 ├ ${prefix}atraso
+├ ${prefix}spam-call
+├    𝒫𝒞
+├ ${prefix}doc-pc
 ├    𝐼𝑜𝓈
 ├ ${prefix}crash-ios
-├ ${prefix}atraso
 ├   𝒢𝓇𝓊𝓅𝑜𝓈
 ├ ${prefix}canal-adm
+├ ${prefix}button 
 │
 ╰─────────────⪨`}, 
 { quoted: aña }); 

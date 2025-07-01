@@ -13,7 +13,7 @@ const smsg = require('./lib/smsg');
 const { isUrl, generateMessageTag, getBuffer, getSizeMedia, fetch, await, sleep, reSize } = require('./lib/myfunc')
 const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) })
 const question = (text) => { const rl = readline.createInterface({ input: process.stdin, output: process.stdout }); return new Promise((resolve) => { rl.question(text, resolve) }) };
-
+const crypto = require('crypto');
 async function startpairing(phoneNumber, sessionPath) {
   async function WhatsAppStart() {
     // Usar la ruta de sesión pasada como parámetro

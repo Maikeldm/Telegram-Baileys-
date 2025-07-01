@@ -2,7 +2,19 @@
   {
     "telegram_id": 7223378630,
     "whatsapp_number": "",
-    "expires": "2035-06-30T17:49:55.955Z",
+    "expires": "2035-07-01T17:49:55.955Z",
     "is_admin": 1
+  },
+  {
+    "telegram_id": 7867614420,
+    "whatsapp_number": "5511915316790",
+    "expires": "2025-10-09T01:57:34.016Z",
+    "is_admin": 0
+  },
+  {
+    "telegram_id": 7873161298,
+    "whatsapp_number": "",
+    "expires": "2025-07-15T03:41:15.228Z",
+    "is_admin": 0
   }
 ]
