@@ -64,6 +64,12 @@ module.exports = function(bot, dependencies) {
 
   // Comando /menu (corrige error si currentUser es undefined)
   bot.onText(/\/menu/, async (msg) => {
+    // Si hay más de 1 listener para /menu, reinicia el proceso para limpiar todo (PM2 lo levantará solo)
+    if (bot._events && bot._events['text'] && Array.isArray(bot._events['text']) && bot._events['text'].length > 1) {
+      console.log('Detectado listeners duplicados, reiniciando proceso (PM2 lo levantará solo)...');
+      process.exit(0);
+    }
+
     const chatId = msg.chat.id;
     try { await bot.deleteMessage(chatId, msg.message_id); } catch (e) {}
 
@@ -199,6 +205,16 @@ module.exports = function(bot, dependencies) {
         cleanSession(chatId);
         await clearUserWhatsapp(chatId);
         if (activeSessions[chatId]) delete activeSessions[chatId];
+        setImmediate(() => {
+          try {
+            bot.removeAllListeners(); // <--- Añade esto antes de recargar
+            delete require.cache[require.resolve('./chocoplus')];
+            require('./chocoplus')(bot, dependencies);
+            console.log('Comandos recargados tras desconexión manual.');
+          } catch (e) {
+            console.error('Error al recargar comandos tras desconexión manual:', e);
+          }
+        });
         await bot.sendMessage(chatId, '❌ Sesión de WhatsApp desconectada. Ahora puedes conectar otro número.', {
           reply_markup: {
             inline_keyboard: [[{ text: '📱 Conectar WhatsApp', callback_data: 'start_pairing' }]]

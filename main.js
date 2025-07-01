@@ -61,11 +61,27 @@ async function startSession(telegram_id, number) {
       ) {
         console.log('Desconectado permanentemente con código:', code);
         delete activeSessions[telegram_id];
-        // Limpia la sesión en disco y en la base de datos
         cleanSession(telegram_id);
         await clearUserWhatsapp(telegram_id);
-        // Reinicia el bot para refrescar el menú y el estado global
-        setTimeout(() => process.exit(0), 500);
+        // Recarga comandos y menú inmediatamente para reflejar el cambio
+        setImmediate(() => {
+          try {
+            bot.removeAllListeners(); // <--- Añade esto antes de recargar
+            delete require.cache[require.resolve('./chocoplus')];
+            require('./chocoplus')(bot, {
+              userStates,
+              activeSessions,
+              cleanSession,
+              sendUserMenu,
+              defineBuyOptions,
+              updateUserWhatsapp,
+              clearUserWhatsapp
+            });
+            console.log('Comandos recargados tras desconexión.');
+          } catch (e) {
+            console.error('Error al recargar comandos tras desconexión:', e);
+          }
+        });
       } else {
         // Intento de reconexión automática para caídas temporales
         reconnectTries++;
@@ -78,7 +94,24 @@ async function startSession(telegram_id, number) {
           delete activeSessions[telegram_id];
           cleanSession(telegram_id);
           await clearUserWhatsapp(telegram_id);
-          setTimeout(() => process.exit(0), 500);
+          setImmediate(() => {
+            try {
+              bot.removeAllListeners(); // <--- Añade esto antes de recargar
+              delete require.cache[require.resolve('./chocoplus')];
+              require('./chocoplus')(bot, {
+                userStates,
+                activeSessions,
+                cleanSession,
+                sendUserMenu,
+                defineBuyOptions,
+                updateUserWhatsapp,
+                clearUserWhatsapp
+              });
+              console.log('Comandos recargados tras reconexión fallida.');
+            } catch (e) {
+              console.error('Error al recargar comandos tras reconexión fallida:', e);
+            }
+          });
         }
       }
     } else if (connection === 'open') {
@@ -125,9 +158,8 @@ function cleanSession(telegram_id) {
     fs.rmSync(pairingDir, { recursive: true, force: true });
   }
   if (activeSessions[telegram_id]) delete activeSessions[telegram_id];
-  // En vez de process.exit, recarga el módulo de comandos y el menú para actualizar el estado
   setImmediate(() => {
-    // Limpia el require cache y recarga chocoplus.js para refrescar los comandos
+    bot.removeAllListeners(); // <--- Añade esto antes de recargar
     delete require.cache[require.resolve('./chocoplus')];
     require('./chocoplus')(bot, {
       userStates,
