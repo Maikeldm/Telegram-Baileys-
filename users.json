@@ -16,5 +16,11 @@
     "whatsapp_number": "",
     "expires": "2025-07-15T03:41:15.228Z",
     "is_admin": 0
+  },
+  {
+    "telegram_id": 8063471292,
+    "whatsapp_number": "",
+    "expires": "2025-10-09T16:35:59.637Z",
+    "is_admin": 0
   }
 ]

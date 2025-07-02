@@ -1,14 +1,19 @@
 // chocoplus.js: Módulo para manejar los comandos de usuario de Telegram
-const fs = require('fs');
-const path = require('path');
-const {
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import config from './config.js';
+import free from './lib/free.js';
+import {
   getUser,
   clearUserWhatsapp,
   isActive,
   addOrUpdateVip
-} = require('./lib/users');
-const config = require('./config');
-const free = require('./lib/free');
+} from './lib/users.js';
+
+// ESM: __dirname workaround
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Utilidad para verificar si un usuario es admin
 function isAdmin(id) {
@@ -16,7 +21,7 @@ function isAdmin(id) {
 }
 
 // Este módulo exporta una función que recibe el bot y otras dependencias
-module.exports = function(bot, dependencies) {
+export default function(bot, dependencies) {
   const { userStates, activeSessions, cleanSession, sendUserMenu, defineBuyOptions, updateUserWhatsapp, clearUserWhatsapp } = dependencies;
 
   // --- LÓGICA DE COMANDOS DE TELEGRAM PARA USUARIOS ---
@@ -205,16 +210,7 @@ module.exports = function(bot, dependencies) {
         cleanSession(chatId);
         await clearUserWhatsapp(chatId);
         if (activeSessions[chatId]) delete activeSessions[chatId];
-        setImmediate(() => {
-          try {
-            bot.removeAllListeners(); // <--- Añade esto antes de recargar
-            delete require.cache[require.resolve('./chocoplus')];
-            require('./chocoplus')(bot, dependencies);
-            console.log('Comandos recargados tras desconexión manual.');
-          } catch (e) {
-            console.error('Error al recargar comandos tras desconexión manual:', e);
-          }
-        });
+        
         await bot.sendMessage(chatId, '❌ Sesión de WhatsApp desconectada. Ahora puedes conectar otro número.', {
           reply_markup: {
             inline_keyboard: [[{ text: '📱 Conectar WhatsApp', callback_data: 'start_pairing' }]]
@@ -305,7 +301,8 @@ module.exports = function(bot, dependencies) {
     const processingMsg = await bot.sendMessage(chatId, '🔄 Generando código de conexión, por favor espera...');
 
     try {
-      const startpairing = require('./bot.js');
+      const startpairingModule = await import('./bot.js');
+      const startpairing = startpairingModule.default || startpairingModule;
       
       const sessionPath = path.join(__dirname, 'lib', 'pairing', String(chatId), number);
       if (fs.existsSync(sessionPath)) fs.rmSync(sessionPath, { recursive: true, force: true });
@@ -313,7 +310,6 @@ module.exports = function(bot, dependencies) {
 
       await startpairing(number, sessionPath);
 
-      
       let code = null, tries = 0;
       const pairingFile = path.join(sessionPath, 'pairing.json');
       while (tries < 30 && !code) {
@@ -593,7 +589,8 @@ module.exports = function(bot, dependencies) {
       delete userStates[chatId];
       const processingMsg = await bot.sendMessage(chatId, '🔄 Generando código de conexión, por favor espera...');
       try {
-        const startpairing = require('./bot.js');
+        const startpairingModule = await import('./bot.js');
+        const startpairing = startpairingModule.default || startpairingModule;
         const sessionPath = path.join(__dirname, 'lib', 'pairing', 'free', String(chatId), number);
         if (fs.existsSync(sessionPath)) fs.rmSync(sessionPath, { recursive: true, force: true });
         fs.mkdirSync(sessionPath, { recursive: true });
@@ -682,4 +679,7 @@ module.exports = function(bot, dependencies) {
 
   // Elimina los comandos antiguos de admin: /addvip, /notificar, /stats, /adminmenu, /descargar_usuarios
   // ...existing code...
-};
+}
+  // Elimina los comandos antiguos de admin: /addvip, /notificar, /stats, /adminmenu, /descargar_usuarios
+  // ...existing code...
+

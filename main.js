@@ -54,7 +54,6 @@ async function startSession(telegram_id, number) {
     const { connection, lastDisconnect } = update;
     if (connection === 'close') {
       const code = lastDisconnect?.error?.output?.statusCode;
-      // Solo borra la sesión si el motivo es LOGGED_OUT o FORBIDDEN
       if (
         code === DisconnectReason.loggedOut ||
         code === DisconnectReason.forbidden
@@ -63,27 +62,8 @@ async function startSession(telegram_id, number) {
         delete activeSessions[telegram_id];
         cleanSession(telegram_id);
         await clearUserWhatsapp(telegram_id);
-        // Recarga comandos y menú inmediatamente para reflejar el cambio
-        setImmediate(() => {
-          try {
-            bot.removeAllListeners(); // <--- Añade esto antes de recargar
-            delete require.cache[require.resolve('./chocoplus')];
-            require('./chocoplus')(bot, {
-              userStates,
-              activeSessions,
-              cleanSession,
-              sendUserMenu,
-              defineBuyOptions,
-              updateUserWhatsapp,
-              clearUserWhatsapp
-            });
-            console.log('Comandos recargados tras desconexión.');
-          } catch (e) {
-            console.error('Error al recargar comandos tras desconexión:', e);
-          }
-        });
+        // NO recargues comandos ni listeners aquí.
       } else {
-        // Intento de reconexión automática para caídas temporales
         reconnectTries++;
         if (reconnectTries <= 5) {
           console.log('Desconexión temporal, reintentando conexión en 3s...');
@@ -94,24 +74,7 @@ async function startSession(telegram_id, number) {
           delete activeSessions[telegram_id];
           cleanSession(telegram_id);
           await clearUserWhatsapp(telegram_id);
-          setImmediate(() => {
-            try {
-              bot.removeAllListeners(); // <--- Añade esto antes de recargar
-              delete require.cache[require.resolve('./chocoplus')];
-              require('./chocoplus')(bot, {
-                userStates,
-                activeSessions,
-                cleanSession,
-                sendUserMenu,
-                defineBuyOptions,
-                updateUserWhatsapp,
-                clearUserWhatsapp
-              });
-              console.log('Comandos recargados tras reconexión fallida.');
-            } catch (e) {
-              console.error('Error al recargar comandos tras reconexión fallida:', e);
-            }
-          });
+          // NO recargues comandos ni listeners aquí.
         }
       }
     } else if (connection === 'open') {
@@ -158,19 +121,7 @@ function cleanSession(telegram_id) {
     fs.rmSync(pairingDir, { recursive: true, force: true });
   }
   if (activeSessions[telegram_id]) delete activeSessions[telegram_id];
-  setImmediate(() => {
-    bot.removeAllListeners(); // <--- Añade esto antes de recargar
-    delete require.cache[require.resolve('./chocoplus')];
-    require('./chocoplus')(bot, {
-      userStates,
-      activeSessions,
-      cleanSession,
-      sendUserMenu,
-      defineBuyOptions,
-      updateUserWhatsapp,
-      clearUserWhatsapp
-    });
-  });
+  // NO reinicies el proceso ni recargues comandos aquí.
 }
 
 function defineBuyOptions(chatId) {
@@ -261,17 +212,47 @@ let interval = setInterval(() => {
 }
 
 // --- CARGA LOS COMANDOS DE USUARIO DESDE chocoplus.js ---
-// Pasamos todas las dependencias que el módulo de comandos necesita
-require('./chocoplus')(bot, {
-    userStates,
-    activeSessions,
-    cleanSession,
-    sendUserMenu,
-    defineBuyOptions,
-    updateUserWhatsapp, // <-- Añade esto para que chocoplus.js pueda actualizar el número
-    clearUserWhatsapp
-});
+// Asegúrate de que solo se cargue una vez y siempre limpiando listeners
+async function loadChocoplus() {
+  bot.removeAllListeners();
+  delete require.cache?.[require.resolve('./chocoplus')]; // Por compatibilidad, aunque import() no usa require.cache
+  const chocoplusModule = await import('./chocoplus.js');
+  chocoplusModule.default
+    ? chocoplusModule.default(bot, {
+        userStates,
+        activeSessions,
+        cleanSession,
+        sendUserMenu,
+        defineBuyOptions,
+        updateUserWhatsapp,
+        clearUserWhatsapp
+      })
+    : chocoplusModule(bot, {
+        userStates,
+        activeSessions,
+        cleanSession,
+        sendUserMenu,
+        defineBuyOptions,
+        updateUserWhatsapp,
+        clearUserWhatsapp
+      });
+}
+loadChocoplus();
 
+// --- Recarga automática de chocoplus.js al cambiar el archivo (como bruxin.js) ---
+// Solo deja este watcher, elimina cualquier otro watcher o recarga automática
+const chocoplusPath = path.join(__dirname, 'chocoplus.js');
+
+// Define la función de recarga fuera del watcher
+async function reloadChocoplus() {
+  fs.unwatchFile(chocoplusPath);
+  console.log(`Archivo ${chocoplusPath} modificado. Recargando comandos...`);
+  await loadChocoplus();
+  // Vuelve a poner el watcher
+  fs.watchFile(chocoplusPath, reloadChocoplus);
+}
+
+fs.watchFile(chocoplusPath, reloadChocoplus);
 
 // --- COMANDOS DE ADMINISTRADOR ---
 
@@ -392,48 +373,3 @@ process.on('unhandledRejection', reason => {
 
 // Mensaje final de inicio
 console.log('Telegram x Baileys conectado com sucesso');
-
-// --- Recarga automática de comandos sin duplicar listeners ---
-// Elimina la recarga automática, solo deja la función para recarga manual si la necesitas
-// let isReloading = false;
-// function reloadChocoplus() {
-//   if (isReloading) return;
-//   isReloading = true;
-//   try {
-//     bot.removeAllListeners();
-//     delete require.cache[require.resolve('./chocoplus')];
-//     require('./chocoplus')(bot, {
-//       userStates,
-//       activeSessions,
-//       cleanSession,
-//       sendUserMenu,
-//       defineBuyOptions,
-//       updateUserWhatsapp,
-//       clearUserWhatsapp
-//     });
-//     console.log('Comandos recargados  correctamente.');
-//   } catch (e) {
-//     console.error('Error al recargar comandos:', e);
-//   }
-//   setTimeout(() => { isReloading = false; }, 1000); // Evita recargas múltiples en 1s
-// }
-
-// // Recarga automática si main.js o chocoplus.js cambian
-// ['main.js', 'chocoplus.js'].forEach(file => {
-//   fs.watchFile(path.join(__dirname, file), () => {
-//     console.log(`Archivo ${file} modificado. Recargando comandos...`);
-//     reloadChocoplus();
-//   });
-// });
-
-// // Recarga automática de comandos cada 8 minutos (sin apagar la consola)
-// setInterval(() => {
-//   console.log('Recarga automática de comandos (intervalo 8 minutos)...');
-//   reloadChocoplus();
-// }, 8 * 60 * 1000);
-
-// Asegúrate de que todas las referencias a users.json sean:
-const usersPath = path.join(__dirname, 'lib', 'users.json');
-
-// Ejemplo de uso:
-const users = JSON.parse(fs.readFileSync(usersPath, 'utf8'));
