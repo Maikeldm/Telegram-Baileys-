@@ -680,6 +680,3 @@ export default function(bot, dependencies) {
   // Elimina los comandos antiguos de admin: /addvip, /notificar, /stats, /adminmenu, /descargar_usuarios
   // ...existing code...
 }
-  // Elimina los comandos antiguos de admin: /addvip, /notificar, /stats, /adminmenu, /descargar_usuarios
-  // ...existing code...
-

